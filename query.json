@@ -1,0 +1,12 @@
+{
+    "key_conditions": {
+        "ForumName": {                                                                                                   
+            "attribute_value_list": [                                                                                  
+                {                                                                                                    
+                    "S": "MagnetoDB"
+                }                                                                                                    
+            ],                                                                                                       
+            "comparison_operator": "EQ"
+        }
+    }
+}
