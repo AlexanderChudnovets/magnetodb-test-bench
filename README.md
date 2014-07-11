@@ -1,7 +1,9 @@
-to run master:
+To run benchmark:
 
-locust -f magnetodb.py -H http://192.168.56.101:8480 --master -n 1000
+sudo python benchmark_runner.py /path/to/benchmark_runner.cfg /path/to/locust_file.py
 
-to run slave:
+Example:
+sudo python benchmark_runner.py /home/alex/benchmark_runner.cfg /home/alex/locust/test_query.py
 
-locust -f magnetodb.py -H http://192.168.56.101:8480 --no-web --slave
+FIXME:
+locust should be installed as package. I used venv in this script.

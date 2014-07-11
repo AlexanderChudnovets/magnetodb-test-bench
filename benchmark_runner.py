@@ -1,7 +1,13 @@
 import datetime
+import ConfigParser
 import os
 import re
 import subprocess
+import sys
+import uuid
+
+from fabric.operations import run, sudo, put
+from fabric.context_managers import settings, prefix, cd
 
 
 def change_rrd_dir(conf, rrd_dir):
@@ -40,12 +46,44 @@ def set_collectd_conf(conf, conf_path='/etc/collectd/collectd.conf'):
     open(conf_path, 'w').write(conf)
 
 
-def start_load():
-    # Run loading tool here
-    # Simulate test run for now
-    import time
-    import random
-    time.sleep(random.randrange(60, 180))
+def start_load(cfg, locust_file):
+    host = cfg.get('locust', 'host_to_test')
+    requests_count = cfg.get('locust', 'requests_count')
+    master_ip = cfg.get('locust', 'master_ip')
+    master_port = cfg.get('locust', 'master_port')
+    master_user = cfg.get('locust', 'master_user')
+    master_password = cfg.get('locust', 'master_password')
+
+    worker_ips = cfg.get('locust', 'worker_ips')
+    if not worker_ips:
+        # TODO: shutdown all
+        sys.exit(-1)
+
+    for slave_ip in worker_ips.split(','):
+        slave_user = cfg.get(slave_ip, 'user')
+        slave_password = cfg.get(slave_ip, 'password')
+        start_locust_slave(slave_ip, slave_user, slave_password, locust_file, host, master_ip, master_port)
+
+    start_locust_master(master_ip, master_port, master_user, master_password, locust_file, host, requests_count)
+
+
+def runbg(cmd, sockname="dtach"):
+    return run('dtach -n `mktemp -u /tmp/%s.XXXX` %s'  % (sockname, cmd))
+
+def start_locust_master(master_ip, master_port, master_user, master_password, locust_file, host, requests_count):
+    with (settings(host_string=master_ip, user=master_user, password=master_password)):
+        with cd('locust'), prefix('source .venv/bin/activate'):
+            cmd = 'locust -f %s -H %s --master -n %s --master-bind-host=%s --master-bind-port=%s'
+            run(cmd % (locust_file, host, requests_count, master_ip, master_port))
+
+
+def start_locust_slave(slave_ip, slave_user, slave_password, locust_file, host, master_ip, master_port):
+    with (settings(host_string=slave_ip, user=slave_user, password=slave_password)):
+        with cd('locust'), prefix('source .venv/bin/activate'):
+            cmd = 'locust -f %s -H %s --no-web --slave --master-host=%s --master-port=%s'
+            slave_locust_file = '/tmp/%s.py' % uuid.uuid4()
+            put(locust_file, slave_locust_file)
+            runbg(cmd % (slave_locust_file, host, master_ip, master_port))
 
 
 def get_timestamp_str(timestamp=None):
@@ -59,10 +97,19 @@ def store_results(results_dir):
     os.rename(results_dir, '%s_%s' % (results_dir,
         get_timestamp_str()))
 
-def run_bench(results_dir):
+
+def main(cfg_file, locust_file):
+    cfg = ConfigParser.ConfigParser()
+    cfg.read(cfg_file)
+
+    base_dir =cfg.get('global', 'base_dir')
+    prefix = cfg.get('global', 'result_dir_prefix')
+    dir_name = '%s_%s' % (prefix, get_timestamp_str())
+    results_dir = os.path.join(base_dir, dir_name)
+
     print ("Setup monitioring...")
     stop_monitoring()
-    
+
     rrd_dir = os.path.join(results_dir, 'rrd')
     os.makedirs(rrd_dir)
     conf = get_collectd_conf()
@@ -71,7 +118,7 @@ def run_bench(results_dir):
     start_monitoring()
     
     print ("Start loading...")
-    start_load()
+    start_load(cfg, locust_file)
 
     print ("Saving results...")
     store_results(results_dir)
@@ -79,11 +126,8 @@ def run_bench(results_dir):
     print ("Done.")
 
 
-def main():
-    base_dir = '/home/alex'
-    dir_name = 'test_%s' % get_timestamp_str()
-    run_bench(os.path.join(base_dir, dir_name))
-
-
 if __name__ == '__main__':
-    main()
+    if len(sys.argv) < 3:
+        print "Usage: %s /path/to/config.cfg /path/to/locust_file.py" % sys.argv[0]
+        sys.exit(-1)
+    main(sys.argv[1], sys.argv[2])
