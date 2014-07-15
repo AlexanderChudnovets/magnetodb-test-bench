@@ -89,13 +89,25 @@ def start_locust_slave(slave_ip, slave_user, slave_password, locust_file, host, 
 def get_timestamp_str(timestamp=None):
     if timestamp:
         return timestamp.isoformat()
-    return datetime.datetime.now().isoformat()
+    return datetime.datetime.now().isoformat().replace('-', '_').replace('.', '_').replace(':', '_')
     
 
 def store_results(results_dir):
     stop_monitoring()
     os.rename(results_dir, '%s_%s' % (results_dir,
         get_timestamp_str()))
+
+
+def save_test_cfg(cfg_file, locust_file, results_dir):
+    dst = os.path.join(results_dir, os.path.basename(cfg_file))
+    cmd = ['cp', cfg_file, dst]
+    print ' '.join(cmd)
+    subprocess.call(cmd, shell=False)
+
+    dst = os.path.join(results_dir, os.path.basename(locust_file))
+    cmd = ['cp', locust_file, dst]
+    print ' '.join(cmd)
+    subprocess.call(cmd, shell=False)
 
 
 def main(cfg_file, locust_file):
@@ -119,6 +131,8 @@ def main(cfg_file, locust_file):
     
     print ("Start loading...")
     start_load(cfg, locust_file)
+
+    save_test_cfg(cfg_file, locust_file, results_dir)
 
     print ("Saving results...")
     store_results(results_dir)
