@@ -72,18 +72,19 @@ def runbg(cmd, sockname="dtach"):
 
 def start_locust_master(master_ip, master_port, master_user, master_password, locust_file, host, requests_count):
     with (settings(host_string=master_ip, user=master_user, password=master_password)):
-        with cd('locust'), prefix('source .venv/bin/activate'):
-            cmd = 'locust -f %s -H %s --master -n %s --master-bind-host=%s --master-bind-port=%s'
-            run(cmd % (locust_file, host, requests_count, master_ip, master_port))
+#        with cd('locust'), prefix('source .venv/bin/activate'):
+#        with cd('locust'):
+        cmd = 'locust -f %s -H %s --master -n %s --master-bind-host=%s --master-bind-port=%s'
+        run(cmd % (locust_file, host, requests_count, master_ip, master_port))
 
 
 def start_locust_slave(slave_ip, slave_user, slave_password, locust_file, host, master_ip, master_port):
     with (settings(host_string=slave_ip, user=slave_user, password=slave_password)):
-        with cd('locust'), prefix('source .venv/bin/activate'):
-            cmd = 'locust -f %s -H %s --no-web --slave --master-host=%s --master-port=%s'
-            slave_locust_file = '/tmp/%s.py' % uuid.uuid4()
-            put(locust_file, slave_locust_file)
-            runbg(cmd % (slave_locust_file, host, master_ip, master_port))
+#        with cd('locust'):
+         cmd = 'locust -f %s -H %s --no-web --slave --master-host=%s --master-port=%s'
+         slave_locust_file = '/tmp/%s.py' % uuid.uuid4()
+         put(locust_file, slave_locust_file)
+         runbg(cmd % (slave_locust_file, host, master_ip, master_port))
 
 
 def get_timestamp_str(timestamp=None):
@@ -127,8 +128,11 @@ def main(cfg_file, locust_file):
     conf = get_collectd_conf()
     set_collectd_conf(change_rrd_dir(conf, rrd_dir))
 
+    # host = cfg.get('locust', 'host_to_test')
+    # subprocess.call(' '.join("python", locust_file, host, "start"))
+
     start_monitoring()
-    
+
     print ("Start loading...")
     start_load(cfg, locust_file)
 
@@ -136,6 +140,8 @@ def main(cfg_file, locust_file):
 
     print ("Saving results...")
     store_results(results_dir)
+
+    # subprocess.call(' '.join("python", locust_file, host, "end"))
 
     print ("Done.")
 

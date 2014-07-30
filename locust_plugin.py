@@ -29,7 +29,7 @@ def read(data=None):
     data = rsp.json()
 
     if not data or ('stats' not in data):
-        collectd.error('redis plugin: No info received')
+        collectd.error('locust plugin: No info received')
         return
 
     for r in data['stats']:
