@@ -2,15 +2,14 @@ import json
 import random
 import string
 import locust
-import sys
 from gevent import GreenletExit
 from locust.events import EventHook
 from locust import task
 
 import config as cfg
+import queries as qry
 
-MIN_WAIT = cfg.MIN_WAIT
-MAX_WAIT = cfg.MAX_WAIT
+
 IS_FIRST_RUN = cfg.IS_FIRST_RUN
 
 table_3_fields_no_lsi_list = []
@@ -48,7 +47,7 @@ class UserBehavior(locust.TaskSet):
         global table_3_fields_1_lsi_list
         global table_10_fields_5_lsi_list
 
-        with open(cfg.TABLE_LIST) as table_list_file:
+        with open(qry.TABLE_LIST) as table_list_file:
             table_list = json.load(table_list_file)
             table_3_fields_no_lsi_list = table_list['table_3_fields_no_lsi']
             table_3_fields_1_lsi_list = table_list['table_3_fields_1_lsi']
@@ -59,7 +58,7 @@ class UserBehavior(locust.TaskSet):
         global key_3_fields_1_lsi_list
         global key_10_fields_5_lsi_list
 
-        with open(cfg.ITEM_KEY_LIST) as item_key_list_file:
+        with open(qry.ITEM_KEY_LIST) as item_key_list_file:
             item_key_list = json.load(item_key_list_file)
             key_3_fields_no_lsi_list = item_key_list['key_3_fields_no_lsi']
             key_3_fields_1_lsi_list = item_key_list['key_3_fields_1_lsi']
@@ -74,7 +73,7 @@ class UserBehavior(locust.TaskSet):
         if len(key_3_fields_no_lsi_list) > 0:
             attribute_key = random.choice(key_3_fields_no_lsi_list)
             subject_key = attribute_key["Subject"]
-            self.client.post(req_url, cfg.GET_ITEM_3_FIELDS_NO_LSI_RQ % subject_key, headers=cfg.req_headers, name="get_item")
+            self.client.post(req_url, qry.GET_ITEM_3_FIELDS_NO_LSI_RQ % subject_key, headers=qry.req_headers, name="get_item")
 
 
     @task(10)
@@ -86,7 +85,7 @@ class UserBehavior(locust.TaskSet):
         if len(key_3_fields_1_lsi_list) > 0:
             attribute_key = random.choice(key_3_fields_1_lsi_list)
             subject_key = attribute_key["Subject"]
-            self.client.post(req_url, cfg.GET_ITEM_3_FIELDS_1_LSI_RQ % subject_key, headers=cfg.req_headers, name="get_item")
+            self.client.post(req_url, qry.GET_ITEM_3_FIELDS_1_LSI_RQ % subject_key, headers=qry.req_headers, name="get_item")
 
     @task(10)
     def get_item_10_fields_5_lsi(self):
@@ -97,13 +96,13 @@ class UserBehavior(locust.TaskSet):
         if len(key_10_fields_5_lsi_list) > 0:
             attribute_key = random.choice(key_10_fields_5_lsi_list)
             subject_key = attribute_key["Subject"]
-            self.client.post(req_url, cfg.GET_ITEM_10_FIELDS_5_LSI_RQ % subject_key, headers=cfg.req_headers, name="get_item")
+            self.client.post(req_url, qry.GET_ITEM_10_FIELDS_5_LSI_RQ % subject_key, headers=qry.req_headers, name="get_item")
 
 
 class MagnetoDBUser(locust.HttpLocust):
     task_set = UserBehavior
-    min_wait = MIN_WAIT
-    max_wait = MAX_WAIT
+    min_wait = cfg.MIN_WAIT
+    max_wait = cfg.MAX_WAIT
 
 
 # Master code
@@ -122,21 +121,3 @@ def on_slave_report(client_id, data):
 
 
 locust.events.slave_report += on_slave_report
-
-def main(host, cmd):
-    if cmd == "start":
-        print "Initializing ..."
-
-    elif cmd == "end":
-        print "Clean up ..."
-
-    else:
-        print "Invalid command, exiting ..."
-    print ("Done.")
-
-
-if __name__ == '__main__':
-    if len(sys.argv) < 3:
-        print "Usage: %s host_url start|end" % sys.argv[0]
-        sys.exit(-1)
-    main(sys.argv[1], sys.argv[2])

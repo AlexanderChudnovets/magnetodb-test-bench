@@ -3,16 +3,14 @@ import random
 import string
 import locust
 import time
-import sys
 import requests
 
 from gevent import GreenletExit
 from locust.events import EventHook
 from locust import task
 import config as cfg
+import queries as qry
 
-MIN_WAIT = cfg.MIN_WAIT
-MAX_WAIT = cfg.MAX_WAIT
 IS_FIRST_RUN = cfg.IS_FIRST_RUN
 
 table_3_fields_no_lsi_list = []
@@ -35,7 +33,7 @@ def dump_tables_created():
         "table_3_fields_1_lsi": table_3_fields_1_lsi_list,
         "table_10_fields_5_lsi": table_10_fields_5_lsi_list
     }
-    with open(cfg.TABLE_LIST, 'w') as table_files:
+    with open(qry.TABLE_LIST, 'w') as table_files:
         json.dump(tables, table_files)
 
 
@@ -45,7 +43,7 @@ def dump_item_keys_created():
         "key_3_fields_1_lsi": key_3_fields_1_lsi_list,
         "key_10_fields_5_lsi": key_10_fields_5_lsi_list
     }
-    with open(cfg.ITEM_KEY_LIST, 'w') as item_files:
+    with open(qry.ITEM_KEY_LIST, 'w') as item_files:
         json.dump(keys, item_files)
 
 
@@ -70,7 +68,7 @@ class UserBehavior(locust.TaskSet):
         global table_3_fields_1_lsi_list
         global table_10_fields_5_lsi_list
 
-        with open(cfg.TABLE_LIST) as table_list_file:
+        with open(qry.TABLE_LIST) as table_list_file:
             table_list = json.load(table_list_file)
             table_3_fields_no_lsi_list = table_list['table_3_fields_no_lsi']
             table_3_fields_1_lsi_list = table_list['table_3_fields_1_lsi']
@@ -80,13 +78,13 @@ class UserBehavior(locust.TaskSet):
         req_url = ('/v1/' +
                    cfg.PROJECT_ID +
                    '/data/tables')
-        self.client.post(req_url, body, headers=cfg.req_headers, name=name)
+        self.client.post(req_url, body, headers=qry.req_headers, name=name)
 
         while True:
             req_url = ('/v1/' +
                    cfg.PROJECT_ID +
                    '/data/tables/' + table_name)
-            resp = self.client.get(req_url, headers=cfg.req_headers,
+            resp = self.client.get(req_url, headers=qry.req_headers,
                                    name="describe_table_helper_ignore")
             if resp.status_code != 200 or "ACTIVE" in resp.content:
                 break
@@ -99,7 +97,7 @@ class UserBehavior(locust.TaskSet):
             "table_3_fields_1_lsi": table_3_fields_1_lsi_list,
             "table_10_fields_5_lsi": table_10_fields_5_lsi_list
         }
-        with open(cfg.TABLE_LIST, 'w') as table_files:
+        with open(qry.TABLE_LIST, 'w') as table_files:
             json.dump(tables, table_files)
 
 
@@ -110,12 +108,12 @@ class UserBehavior(locust.TaskSet):
         req_url = ('/v1/' +
                cfg.PROJECT_ID +
                '/data/tables/' + table_name)
-        resp = self.client.get(req_url, headers=cfg.req_headers,
+        resp = self.client.get(req_url, headers=qry.req_headers,
                                name="describe_table_helper_ignore")
         if resp.status_code == 400 and "already exists" in resp.content:
             return
         self.create_table_util(table_name,
-                               cfg.CREATE_TABLE_3_fields_NO_LSI_RQ % table_name,
+                               qry.CREATE_TABLE_3_fields_NO_LSI_RQ % table_name,
                                "create_table_3_fields_no_lsi")
 
     def create_table_3_fields_1_lsi(self):
@@ -126,12 +124,12 @@ class UserBehavior(locust.TaskSet):
                cfg.PROJECT_ID +
                '/data/tables/' + table_name)
         resp = self.client.get(req_url,
-                               headers=cfg.req_headers,
+                               headers=qry.req_headers,
                                name="describe_table_helper_ignore")
         if resp.status_code == 400 and "already exists" in resp.content:
             return
         self.create_table_util(table_name,
-                               cfg.CREATE_TABLE_3_fields_1_LSI_RQ % table_name,
+                               qry.CREATE_TABLE_3_fields_1_LSI_RQ % table_name,
                                "create_table_3_fields_1_lsi")
 
     def create_table_10_fields_5_lsi(self):
@@ -141,11 +139,11 @@ class UserBehavior(locust.TaskSet):
         req_url = ('/v1/' +
                cfg.PROJECT_ID +
                '/data/tables/' + table_name)
-        resp = self.client.get(req_url, headers=cfg.req_headers, name="describe_table_helper_ignore")
+        resp = self.client.get(req_url, headers=qry.req_headers, name="describe_table_helper_ignore")
         if resp.status_code == 400 and "already exists" in resp.content:
             return
         self.create_table_util(table_name,
-                               cfg.CREATE_TABLE_10_fields_5_LSI_RQ % table_name,
+                               qry.CREATE_TABLE_10_fields_5_LSI_RQ % table_name,
                                "create_table_10_fields_5_lsi")
 
     @task(10)
@@ -157,8 +155,8 @@ class UserBehavior(locust.TaskSet):
         subject_key = random_name(20)
         post_by = random_name(20)
         resp = self.client.post(req_url,
-                                cfg.PUT_ITEM_3_FIELDS_NO_LSI_RQ % (subject_key, post_by),
-                                headers=cfg.req_headers,
+                                qry.PUT_ITEM_3_FIELDS_NO_LSI_RQ % (subject_key, post_by),
+                                headers=qry.req_headers,
                                 name="put_item")
         if resp.status_code == 200:
             key_3_fields_no_lsi_list.append(
@@ -174,8 +172,8 @@ class UserBehavior(locust.TaskSet):
             attribute_key = random.choice(key_3_fields_no_lsi_list)
             subject_key = attribute_key["Subject"]
             self.client.post(req_url,
-                             cfg.GET_ITEM_3_FIELDS_NO_LSI_RQ % subject_key,
-                             headers=cfg.req_headers, name="get_item")
+                             qry.GET_ITEM_3_FIELDS_NO_LSI_RQ % subject_key,
+                             headers=qry.req_headers, name="get_item")
 
 
     @task(10)
@@ -188,8 +186,8 @@ class UserBehavior(locust.TaskSet):
         post_by = random_name(20)
 
         resp = self.client.post(req_url,
-                                cfg.PUT_ITEM_3_FIELDS_1_LSI_RQ % (subject_key, post_by),
-                                headers=cfg.req_headers,
+                                qry.PUT_ITEM_3_FIELDS_1_LSI_RQ % (subject_key, post_by),
+                                headers=qry.req_headers,
                                 name="put_item_3_fields_1_lsi")
         if resp.status_code == 200:
             key_3_fields_1_lsi_list.append({"Subject": subject_key, "LastPostedBy": post_by})
@@ -204,8 +202,8 @@ class UserBehavior(locust.TaskSet):
             attribute_key = random.choice(key_3_fields_1_lsi_list)
             subject_key = attribute_key["Subject"]
             self.client.post(req_url,
-                             cfg.GET_ITEM_3_FIELDS_1_LSI_RQ % subject_key,
-                             headers=cfg.req_headers, name="get_item")
+                             qry.GET_ITEM_3_FIELDS_1_LSI_RQ % subject_key,
+                             headers=qry.req_headers, name="get_item")
 
     @task(10)
     def put_item_10_fields_5_lsi(self):
@@ -224,11 +222,11 @@ class UserBehavior(locust.TaskSet):
         addtional_field_7 = random_name(20)
 
         resp = self.client.post(req_url,
-                                cfg.PUT_ITEM_10_FIELDS_5_LSI_RQ % (subject_key, post_by,
+                                qry.PUT_ITEM_10_FIELDS_5_LSI_RQ % (subject_key, post_by,
                                 addtional_field_1, addtional_field_2, addtional_field_3,
                                 addtional_field_4, addtional_field_5, addtional_field_6,
                                 addtional_field_7),
-                                headers=cfg.req_headers,
+                                headers=qry.req_headers,
                                 name="put_item")
         if resp.status_code == 200:
             key_10_fields_5_lsi_list.append(
@@ -249,8 +247,8 @@ class UserBehavior(locust.TaskSet):
             attribute_key = random.choice(key_10_fields_5_lsi_list)
             subject_key = attribute_key["Subject"]
             self.client.post(req_url,
-                             cfg.GET_ITEM_10_FIELDS_5_LSI_RQ % subject_key,
-                             headers=cfg.req_headers,
+                             qry.GET_ITEM_10_FIELDS_5_LSI_RQ % subject_key,
+                             headers=qry.req_headers,
                              name="get_item")
 
     @task(1)
@@ -260,8 +258,8 @@ class UserBehavior(locust.TaskSet):
                    cfg.PROJECT_ID +
                    '/data/tables/' + table_name + '/query')
         self.client.post(req_url,
-                         cfg.QUERY_3_FIELDS_NO_LSI_RQ1,
-                         headers=cfg.req_headers,
+                         qry.QUERY_3_FIELDS_NO_LSI_RQ1,
+                         headers=qry.req_headers,
                          name="query_hash_only")
 
     @task(1)
@@ -271,8 +269,8 @@ class UserBehavior(locust.TaskSet):
                    cfg.PROJECT_ID +
                    '/data/tables/' + table_name + '/query')
         self.client.post(req_url,
-                         cfg.QUERY_3_FIELDS_1_LSI_RQ1,
-                         headers=cfg.req_headers,
+                         qry.QUERY_3_FIELDS_1_LSI_RQ1,
+                         headers=qry.req_headers,
                          name="query_hash_only")
 
     @task(5)
@@ -285,8 +283,8 @@ class UserBehavior(locust.TaskSet):
             attribute_key = random.choice(key_3_fields_1_lsi_list)
             post_by = attribute_key["LastPostedBy"]
             self.client.post(req_url,
-                             cfg.QUERY_3_FIELDS_1_LSI_RQ2 % post_by,
-                             headers=cfg.req_headers, name="query_hash_range")
+                             qry.QUERY_3_FIELDS_1_LSI_RQ2 % post_by,
+                             headers=qry.req_headers, name="query_hash_range")
 
     @task(1)
     def query_10_fields_5_lsi_1(self):
@@ -295,8 +293,8 @@ class UserBehavior(locust.TaskSet):
                    cfg.PROJECT_ID +
                    '/data/tables/' + table_name + '/query')
         self.client.post(req_url,
-                         cfg.QUERY_10_FIELDS_5_LSI_RQ1,
-                         headers=cfg.req_headers,
+                         qry.QUERY_10_FIELDS_5_LSI_RQ1,
+                         headers=qry.req_headers,
                          name="query_hash_only")
 
     @task(5)
@@ -309,8 +307,8 @@ class UserBehavior(locust.TaskSet):
             attribute_key = random.choice(key_10_fields_5_lsi_list)
             post_by = attribute_key["LastPostedBy"]
             self.client.post(req_url,
-                             cfg.QUERY_10_FIELDS_5_LSI_RQ2 % post_by,
-                             headers=cfg.req_headers, name="query_hash_range")
+                             qry.QUERY_10_FIELDS_5_LSI_RQ2 % post_by,
+                             headers=qry.req_headers, name="query_hash_range")
 
     @task(5)
     def query_10_fields_5_lsi_3(self):
@@ -322,8 +320,8 @@ class UserBehavior(locust.TaskSet):
             attribute_key = random.choice(key_10_fields_5_lsi_list)
             addtional_field_1 = attribute_key["AdditionalField1"]
             self.client.post(req_url,
-                             cfg.QUERY_10_FIELDS_5_LSI_RQ3 % addtional_field_1,
-                             headers=cfg.req_headers, name="query_hash_range")
+                             qry.QUERY_10_FIELDS_5_LSI_RQ3 % addtional_field_1,
+                             headers=qry.req_headers, name="query_hash_range")
 
     @task(5)
     def query_10_fields_5_lsi_4(self):
@@ -335,8 +333,8 @@ class UserBehavior(locust.TaskSet):
             attribute_key = random.choice(key_10_fields_5_lsi_list)
             addtional_field_2 = attribute_key["AdditionalField2"]
             self.client.post(req_url,
-                             cfg.QUERY_10_FIELDS_5_LSI_RQ4 % addtional_field_2,
-                             headers=cfg.req_headers, name="query_hash_range")
+                             qry.QUERY_10_FIELDS_5_LSI_RQ4 % addtional_field_2,
+                             headers=qry.req_headers, name="query_hash_range")
 
     @task(5)
     def query_10_fields_5_lsi_5(self):
@@ -348,8 +346,8 @@ class UserBehavior(locust.TaskSet):
             attribute_key = random.choice(key_10_fields_5_lsi_list)
             addtional_field_3 = attribute_key["AdditionalField3"]
             self.client.post(req_url,
-                             cfg.QUERY_10_FIELDS_5_LSI_RQ5 % addtional_field_3,
-                             headers=cfg.req_headers, name="query_hash_range")
+                             qry.QUERY_10_FIELDS_5_LSI_RQ5 % addtional_field_3,
+                             headers=qry.req_headers, name="query_hash_range")
 
     @task(5)
     def query_10_fields_5_lsi_6(self):
@@ -361,15 +359,15 @@ class UserBehavior(locust.TaskSet):
             attribute_key = random.choice(key_10_fields_5_lsi_list)
             addtional_field_4 = attribute_key["AdditionalField4"]
             self.client.post(req_url,
-                             cfg.QUERY_10_FIELDS_5_LSI_RQ6 % addtional_field_4,
-                             headers=cfg.req_headers, name="query_hash_range")
+                             qry.QUERY_10_FIELDS_5_LSI_RQ6 % addtional_field_4,
+                             headers=qry.req_headers, name="query_hash_range")
 
 
 
 class MagnetoDBUser(locust.HttpLocust):
     task_set = UserBehavior
-    min_wait = MIN_WAIT
-    max_wait = MAX_WAIT
+    min_wait = cfg.MIN_WAIT
+    max_wait = cfg.MAX_WAIT
 
 
 # Master code
@@ -393,7 +391,7 @@ def create_table_helper(host, table_name, body):
     req_url = (host + '/v1/' +
                cfg.PROJECT_ID +
                '/data/tables/' + table_name)
-    resp = requests.get(req_url, headers=cfg.req_headers)
+    resp = requests.get(req_url, headers=qry.req_headers)
     if resp.status_code == 400 and "already exists" in resp.content:
         pass
     else:
@@ -402,50 +400,15 @@ def create_table_helper(host, table_name, body):
                    '/data/tables')
         requests.post(req_url,
                       body,
-                      headers=cfg.req_headers)
+                      headers=qry.req_headers)
         count = 0
         while count < 100:
             req_url = (host + '/v1/' +
                        cfg.PROJECT_ID +
                        '/data/tables/' + table_name)
-            resp = requests.get(req_url, headers=cfg.req_headers)
+            resp = requests.get(req_url, headers=qry.req_headers)
             if resp.status_code != 200 or "ACTIVE" in resp.content:
                 break
             else:
                 count += 1
                 time.sleep(1)
-
-
-def main(host, cmd):
-    if cmd == "start":
-        print "Initializing ..."
-
-        table_name = random_name(20)
-        table_3_fields_no_lsi_list.append(table_name)
-        create_table_helper(host, table_name,
-                            cfg.CREATE_TABLE_3_fields_NO_LSI_RQ % table_name)
-
-        table_name = random_name(20)
-        table_3_fields_1_lsi_list.append(table_name)
-        create_table_helper(host, table_name,
-                            cfg.CREATE_TABLE_3_fields_1_LSI_RQ % table_name)
-
-        table_name = random_name(20)
-        table_10_fields_5_lsi_list.append(table_name)
-        create_table_helper(host, table_name,
-                            cfg.CREATE_TABLE_10_fields_5_LSI_RQ % table_name)
-
-        dump_tables_created()
-    elif cmd == "end":
-        print "Clean up ..."
-
-    else:
-        print "Invalid command, exiting ..."
-    print ("Done.")
-
-
-if __name__ == '__main__':
-    if len(sys.argv) < 3:
-        print "Usage: %s host_url start|end" % sys.argv[0]
-        sys.exit(-1)
-    main(sys.argv[1], sys.argv[2])
