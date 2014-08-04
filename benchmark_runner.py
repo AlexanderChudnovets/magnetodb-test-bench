@@ -128,8 +128,14 @@ def main(cfg_file, locust_file):
     conf = get_collectd_conf()
     set_collectd_conf(change_rrd_dir(conf, rrd_dir))
 
-    # host = cfg.get('locust', 'host_to_test')
-    # subprocess.call(' '.join("python", locust_file, host, "start"))
+    host = cfg.get('locust', 'host_to_test')
+    keystone_url = cfg.get('keystone', 'keystone_url')
+    user = cfg.get('keystone', 'user')
+    password = cfg.get('keystone', 'password')
+    domain_name = cfg.get('keystone', 'domain_name')
+    project_name = cfg.get('keystone', 'project_name')
+    project_id = cfg.get('keystone', 'project_id')
+    # subprocess.call(' '.join("python ", locust_file, "/setup.py", host, keystone_url, user, password, domain_name, project_name, project_id))
 
     start_monitoring()
 
@@ -141,7 +147,7 @@ def main(cfg_file, locust_file):
     print ("Saving results...")
     store_results(results_dir)
 
-    # subprocess.call(' '.join("python", locust_file, host, "end"))
+    # subprocess.call(' '.join("python ", locust_file, "/teardown.py", host))
 
     print ("Done.")
 
