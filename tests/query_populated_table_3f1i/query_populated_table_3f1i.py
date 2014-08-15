@@ -5,26 +5,18 @@ import locust
 from gevent import GreenletExit
 from locust.events import EventHook
 from locust import task
-
 import config as cfg
 import queries as qry
 
-
 IS_FIRST_RUN = cfg.IS_FIRST_RUN
 
-table_3_fields_no_lsi_list = []
 table_3_fields_1_lsi_list = []
-table_10_fields_5_lsi_list = []
-
-key_3_fields_no_lsi_list = []
 key_3_fields_1_lsi_list = []
-key_10_fields_5_lsi_list = []
 
 PROJECT_ID = qry.PROJECT_ID
 
 
 class UserBehavior(locust.TaskSet):
-
     def on_start(self):
         self.load_table_list()
         self.load_item_key_list()
@@ -45,60 +37,43 @@ class UserBehavior(locust.TaskSet):
                        for i in range(length))
 
     def load_table_list(self):
-        global table_3_fields_no_lsi_list
         global table_3_fields_1_lsi_list
-        global table_10_fields_5_lsi_list
 
         with open(qry.TABLE_LIST) as table_list_file:
             table_list = json.load(table_list_file)
-            table_3_fields_no_lsi_list = table_list['table_3_fields_no_lsi']
             table_3_fields_1_lsi_list = table_list['table_3_fields_1_lsi']
-            table_10_fields_5_lsi_list = table_list['table_10_fields_5_lsi']
 
     def load_item_key_list(self):
-        global key_3_fields_no_lsi_list
         global key_3_fields_1_lsi_list
-        global key_10_fields_5_lsi_list
 
         with open(qry.ITEM_KEY_LIST) as item_key_list_file:
             item_key_list = json.load(item_key_list_file)
-            key_3_fields_no_lsi_list = item_key_list['key_3_fields_no_lsi']
             key_3_fields_1_lsi_list = item_key_list['key_3_fields_1_lsi']
-            key_10_fields_5_lsi_list = item_key_list['key_10_fields_5_lsi']
 
-    @task(10)
-    def get_item_3_fields_no_lsi(self):
-        table_name = random.choice(table_3_fields_no_lsi_list)
-        req_url = ('/v1/' +
-                   PROJECT_ID +
-                   '/data/tables/' + table_name + '/get_item')
-        if len(key_3_fields_no_lsi_list) > 0:
-            attribute_key = random.choice(key_3_fields_no_lsi_list)
-            subject_key = attribute_key["Subject"]
-            self.client.post(req_url, qry.GET_ITEM_3_FIELDS_NO_LSI_RQ % subject_key, headers=qry.req_headers, name="get_item_3_fields_no_lsi")
-
-
-    @task(10)
-    def get_item_3_fields_1_lsi(self):
+    @task(1)
+    def query_3_fields_1_lsi_1(self):
         table_name = random.choice(table_3_fields_1_lsi_list)
         req_url = ('/v1/' +
                    PROJECT_ID +
-                   '/data/tables/' + table_name + '/get_item')
-        if len(key_3_fields_1_lsi_list) > 0:
-            attribute_key = random.choice(key_3_fields_1_lsi_list)
-            subject_key = attribute_key["Subject"]
-            self.client.post(req_url, qry.GET_ITEM_3_FIELDS_1_LSI_RQ % subject_key, headers=qry.req_headers, name="get_item_3_fields_1_lsi")
+                   '/data/tables/' + table_name + '/query')
+        self.client.post(req_url,
+                         qry.QUERY_3_FIELDS_1_LSI_RQ1,
+                         headers=qry.req_headers,
+                         name="query_hash_only")
 
-    @task(10)
-    def get_item_10_fields_5_lsi(self):
-        table_name = random.choice(table_10_fields_5_lsi_list)
+    @task(5)
+    def query_3_fields_1_lsi_2(self):
+        table_name = random.choice(table_3_fields_1_lsi_list)
         req_url = ('/v1/' +
                    PROJECT_ID +
-                   '/data/tables/' + table_name + '/get_item')
-        if len(key_10_fields_5_lsi_list) > 0:
-            attribute_key = random.choice(key_10_fields_5_lsi_list)
-            subject_key = attribute_key["Subject"]
-            self.client.post(req_url, qry.GET_ITEM_10_FIELDS_5_LSI_RQ % subject_key, headers=qry.req_headers, name="get_item_10_fields_5_lsi")
+                   '/data/tables/' + table_name + '/query')
+        if len(key_3_fields_1_lsi_list) > 0:
+            attribute_key = random.choice(key_3_fields_1_lsi_list)
+            post_by = attribute_key["LastPostedBy"]
+            self.client.post(req_url,
+                             qry.QUERY_3_FIELDS_1_LSI_RQ2 % post_by,
+                             headers=qry.req_headers,
+                             name="query_hash_range")
 
 
 class MagnetoDBUser(locust.HttpLocust):

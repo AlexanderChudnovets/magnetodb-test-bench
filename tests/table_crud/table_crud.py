@@ -11,6 +11,7 @@ import config as cfg
 import queries as qry
 
 IS_FIRST_RUN = cfg.IS_FIRST_RUN
+PROJECT_ID = qry.PROJECT_ID
 
 table_name_set = set()
 
@@ -20,7 +21,8 @@ class UserBehavior(locust.TaskSet):
         pass
 
     def on_stop(self):
-        self.dump_tables_created()
+        # self.dump_tables_created()
+        self.delete_all_tables()
 
     def run(self, *args, **kwargs):
         try:
@@ -36,13 +38,13 @@ class UserBehavior(locust.TaskSet):
 
     def create_table_util(self, table_name, body, name):
         req_url = ('/v1/' +
-                   cfg.PROJECT_ID +
+                   PROJECT_ID +
                    '/data/tables')
         self.client.post(req_url, body, headers=qry.req_headers, name=name)
 
         while True:
             req_url = ('/v1/' +
-                       cfg.PROJECT_ID +
+                       PROJECT_ID +
                        '/data/tables/' + table_name)
             resp = self.client.get(req_url, headers=qry.req_headers,
                                    name="describe_table_helper_ignore")
@@ -57,52 +59,52 @@ class UserBehavior(locust.TaskSet):
         table_name = self.random_name(20)
 
         req_url = ('/v1/' +
-                   cfg.PROJECT_ID +
+                   PROJECT_ID +
                    '/data/tables/' + table_name)
         resp = self.client.get(req_url, headers=qry.req_headers,
                                name="describe_table_helper_ignore")
         if resp.status_code == 400 and "already exists" in resp.content:
             return
         self.create_table_util(table_name,
-                               qry.CREATE_TABLE_3_fields_NO_LSI_RQ % table_name,
-                               "create_table")
+                               qry.CREATE_TABLE_3_FIELDS_NO_LSI_RQ % table_name,
+                               "create_table_3_fields_no_lsi")
 
     @task(1)
     def create_table_10_fields_no_lsi(self):
         table_name = self.random_name(20)
 
         req_url = ('/v1/' +
-                   cfg.PROJECT_ID +
+                   PROJECT_ID +
                    '/data/tables/' + table_name)
         resp = self.client.get(req_url, headers=qry.req_headers,
                                name="describe_table_helper_ignore")
         if resp.status_code == 400 and "already exists" in resp.content:
             return
         self.create_table_util(table_name,
-                               qry.CREATE_TABLE_10_fields_NO_LSI_RQ % table_name,
-                               "create_table")
+                               qry.CREATE_TABLE_10_FIELDS_NO_LSI_RQ % table_name,
+                               "create_table_10_fields_no_lsi")
 
     @task(3)
     def create_table_3_fields_1_lsi(self):
         table_name = self.random_name(20)
 
         req_url = ('/v1/' +
-                   cfg.PROJECT_ID +
+                   PROJECT_ID +
                    '/data/tables/' + table_name)
         resp = self.client.get(req_url, headers=qry.req_headers,
                                name="describe_table_helper_ignore")
         if resp.status_code == 400 and "already exists" in resp.content:
             return
         self.create_table_util(table_name,
-                               qry.CREATE_TABLE_3_fields_1_LSI_RQ % table_name,
-                               "create_table")
+                               qry.CREATE_TABLE_3_FIELDS_1_LSI_RQ % table_name,
+                               "create_table_3_fields_1_lsi")
 
     @task(5)
     def create_table_10_fields_5_lsi(self):
         table_name = self.random_name(20)
 
         req_url = ('/v1/' +
-                   cfg.PROJECT_ID +
+                   PROJECT_ID +
                    '/data/tables/' + table_name)
         resp = self.client.get(req_url,
                                headers=qry.req_headers,
@@ -110,19 +112,19 @@ class UserBehavior(locust.TaskSet):
         if resp.status_code == 400 and "already exists" in resp.content:
             return
         self.create_table_util(table_name,
-                               qry.CREATE_TABLE_10_fields_5_LSI_RQ % table_name,
-                               "create_table")
+                               qry.CREATE_TABLE_10_FIELDS_5_LSI_RQ % table_name,
+                               "create_table_10_fields_5_lsi")
 
     def delete_table_util(self, table_name):
         req_url = ('/v1/' +
-                   cfg.PROJECT_ID +
+                   PROJECT_ID +
                    '/data/tables/' + table_name)
         self.client.delete(req_url,
                            headers=qry.req_headers,
                            name="delete_table")
         while True:
             req_url = ('/v1/' +
-                       cfg.PROJECT_ID +
+                       PROJECT_ID +
                        '/data/tables/' + table_name)
             resp = self.client.get(req_url,
                                    headers=qry.req_headers,
@@ -138,7 +140,7 @@ class UserBehavior(locust.TaskSet):
         if len(table_name_set) > 0:
             table_name = random.sample(table_name_set, 1)[0]
             req_url = ('/v1/' +
-                       cfg.PROJECT_ID +
+                       PROJECT_ID +
                        '/data/tables/' + table_name)
             resp = self.client.get(req_url, headers=qry.req_headers,
                                    name="describe_table_helper_ignore")
@@ -152,7 +154,7 @@ class UserBehavior(locust.TaskSet):
         if len(table_name_set) > 0:
             table_name = random.sample(table_name_set, 1)[0]
             req_url = ('/v1/' +
-                       cfg.PROJECT_ID +
+                       PROJECT_ID +
                        '/data/tables/' + table_name)
             self.client.get(req_url, headers=qry.req_headers,
                             name="describe_table")
@@ -165,10 +167,9 @@ class UserBehavior(locust.TaskSet):
             json.dump(tables, table_files)
 
     def delete_all_tables(self):
-        global table_name_set
         for table_name in table_name_set:
             req_url = ('/v1/' +
-                       cfg.PROJECT_ID +
+                       PROJECT_ID +
                        '/data/tables/' + table_name)
             resp = self.client.get(req_url, headers=qry.req_headers,
                                    name="describe_table_helper_ignore")
@@ -176,7 +177,6 @@ class UserBehavior(locust.TaskSet):
                 continue
 
             self.delete_table_util(table_name)
-        table_name_set = set()
 
 
 class MagnetoDBUser(locust.HttpLocust):
