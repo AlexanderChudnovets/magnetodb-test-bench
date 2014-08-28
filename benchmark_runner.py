@@ -181,8 +181,8 @@ if __name__ == '__main__':
     if len(sys.argv) < 3:
         print "Usage: %s /path/to/config /path/to/benchmark" % sys.argv[0]
         sys.exit(-1)
-        conf = ConfigParser.ConfigParser()
-        conf.read(sys.argv[1])
+    conf = ConfigParser.ConfigParser()
+    conf.read(sys.argv[1])
     try:
         benchmark = importlib.import_module(sys.argv[2])
     except ImportError:
