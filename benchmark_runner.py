@@ -32,6 +32,7 @@ class BenchmarkRunner(object):
         cmd = ['cp', '-p', self.cfg_file, dst]
         subprocess.call(cmd, shell=False)
 
+        src = os.path.basename(self.benchmark.__path__[0])
         dst = os.path.join(self.results_dir, src)
         cmd = ['cp', '-pr', self.benchmark.__path__[0], dst]
         subprocess.call(cmd, shell=False)
