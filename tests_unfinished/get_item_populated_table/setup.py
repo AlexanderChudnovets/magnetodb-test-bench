@@ -140,10 +140,9 @@ def put_item_10_fields_5_lsi(host, project_id, table_10_fields_5_lsi_list, key_1
              "AdditionalField4": addtional_field_4})
 
 
-def main(host, keystone_url, user, password, domain_name, project_name):
+def setup(host):
     print("Initializing ...")
-    token, project_id = get_token_project(keystone_url, user, password,
-                                          domain_name, project_name)
+    token, project_id = cfg.TOKEN, cfg.PROJECT_ID
 
     table_3_fields_no_lsi_list = []
     table_3_fields_1_lsi_list = []
@@ -179,10 +178,3 @@ def main(host, keystone_url, user, password, domain_name, project_name):
         json.dump(keys, item_files)
 
     print ("Done.")
-
-
-if __name__ == '__main__':
-    if len(sys.argv) < 6:
-        print "Usage: %s host_url keystone_url, user, password, domain_name, project_name" % sys.argv[0]
-        sys.exit(-1)
-    main(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6])
