@@ -13,12 +13,11 @@ from fabric.context_managers import settings, prefix, cd
 import uuid
 
 class BenchmarkRunner(object):
-    def __init__(self, results_dir, cfg_file, benchmark, monitor):
+    def __init__(self, results_dir, cfg_file, cfg, benchmark, monitor):
         self.results_dir = results_dir
         self.benchmark = benchmark
         self.cfg_file = cfg_file
-        self.cfg = ConfigParser.ConfigParser()
-        self.cfg.read(sys.argv[1])
+        self.cfg = cfg
         self.monitor = monitor
 
     def setup(self):
@@ -30,12 +29,11 @@ class BenchmarkRunner(object):
     def save_results(self):
         print "Store results"
         dst = os.path.join(self.results_dir, os.path.basename(self.cfg_file))
-        cmd = ['cp', self.cfg_file, dst]
+        cmd = ['cp', '-p', self.cfg_file, dst]
         subprocess.call(cmd, shell=False)
 
-        src = os.path.basename(self.benchmark.__path__[0])
         dst = os.path.join(self.results_dir, src)
-        cmd = ['cp -r', src, dst]
+        cmd = ['cp', '-pr', self.benchmark.__path__[0], dst]
         subprocess.call(cmd, shell=False)
 
         os.rename(self.results_dir, '%s_%s' % (self.results_dir, get_timestamp()))
@@ -163,7 +161,7 @@ def get_timestamp():
     return datetime.datetime.now().isoformat().replace('.', '_').replace(':', '_')
 
 
-def main(config, benchmark):
+def main(conf_file, config, benchmark):
 
     base_dir = config.get('global', 'base_dir')
     prefix = config.get('global', 'result_dir_prefix')
@@ -175,16 +173,19 @@ def main(config, benchmark):
     if config.get('global', 'monitor') == 'collectd':
         mon = CollectD(rrd_dir)
     if config.get('global', 'loader') == 'locust':
-        runner = LocustBenchmarkRunner(results_dir, config, benchmark, mon)
+        runner = LocustBenchmarkRunner(results_dir, conf_file, config,
+            benchmark, mon)
     runner.run()
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:
         print "Usage: %s /path/to/config /path/to/benchmark" % sys.argv[0]
         sys.exit(-1)
+        conf = ConfigParser.ConfigParser()
+        conf.read(sys.argv[1])
     try:
         benchmark = importlib.import_module(sys.argv[2])
     except ImportError:
         print "Benchmark is not a python package"
         sys.exit(-1)
-    main(conf, benchmark)
+    main(sys.argv[1], conf, benchmark)
