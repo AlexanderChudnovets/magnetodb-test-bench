@@ -37,7 +37,9 @@ class BenchmarkRunner(object):
         cmd = ['cp', '-pr', self.benchmark.__path__[0], dst]
         subprocess.call(cmd, shell=False)
 
-        os.rename(self.results_dir, '%s_%s' % (self.results_dir, get_timestamp()))
+        res = '%s_%s' % (self.results_dir, get_timestamp())
+        os.rename(self.results_dir, res)
+        print 'Stored results in', res
 
     def start_loading(self):
         print "Start loading..."
@@ -130,10 +132,10 @@ class CollectD(Monitor):
         section = section_mt.group()
         dir_rx = re.compile(r'DataDir\s+"[^"]*"')
         if dir_rx.search(section):
-            result = dir_rx.sub('DataDir "%s"' % self.rrd_dir, section)
+            result = dir_rx.sub('DataDir "%s"' % rrd_dir, section)
         else:
             result = section.replace('</Plugin>',
-                    '  DataDir "%s"\n</Plugin>' % self.rrd_dir)
+                    '  DataDir "%s"\n</Plugin>' % rrd_dir)
         with open(conf_file, 'w') as f:
             f.write(section_rx.sub(result, conf))
 
