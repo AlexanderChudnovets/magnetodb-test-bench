@@ -4,6 +4,8 @@ import sys
 import json
 import requests
 import time
+import os
+from subprocess import Popen, PIPE, STDOUT
 import queries as qry
 import config as cfg
 
@@ -128,7 +130,19 @@ def put_item_10_fields_5_lsi(host, project_id, table_10_fields_5_lsi_list, key_1
              "AdditionalField4": addtional_field_4})
 
 
+def cassandra_cleanup():
+    my_env = os.environ.copy()
+    my_env['CASSANDRA_NODE_LIST'] = cfg.CASSANDRA_NODES
+    p = Popen([cfg.CASSANDRA_CLEANER, '-d'], stdout=PIPE,
+        stdin=PIPE, stderr=STDOUT, env=my_env)
+    stdout = p.communicate(input='y')[0]
+    print stdout
+
+
 def setup(host):
+    print('Clean C*...')
+    cassandra_cleanup()
+
     print("Initializing ...")
     token, project_id = cfg.TOKEN, cfg.PROJECT_ID
 

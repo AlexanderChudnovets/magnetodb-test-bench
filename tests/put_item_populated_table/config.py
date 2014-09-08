@@ -10,3 +10,5 @@ PKIZ_eJydV8lyo8oS3ddXvH1HRzPK1uItmAVWFQ1iUNVOIBlRgGS3BoavfwmWfN2Oe_v1bUcoHJRUVZk
 """.strip()
 PROJECT_ID = "12e0d74d13e9415484360d11578c2f9c"
 TABLE_LIST='/tmp/table_list.txt'
+CASSANDRA_NODES='127.0.0.1'
+CASSANDRA_CLEANER='/root/scripts/cleaner.sh'
