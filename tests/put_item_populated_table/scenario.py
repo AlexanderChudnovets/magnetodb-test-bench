@@ -6,6 +6,7 @@ from gevent import GreenletExit
 from locust.events import EventHook
 from locust import task
 import config as cfg
+import ks_config as kscfg
 import queries as qry
 
 table_3_fields_no_lsi_list = []
@@ -15,7 +16,7 @@ table_10_fields_5_lsi_list = []
 key_3_fields_no_lsi_list = []
 key_3_fields_1_lsi_list = []
 key_10_fields_5_lsi_list = []
-PROJECT_ID = cfg.PROJECT_ID
+PROJECT_ID = kscfg.PROJECT_ID
 
 
 class UserBehavior(locust.TaskSet):
@@ -59,7 +60,7 @@ class UserBehavior(locust.TaskSet):
         post_by = self.random_name(20)
         resp = self.client.post(req_url,
                                 qry.PUT_ITEM_3_FIELDS_NO_LSI_RQ % (subject_key, post_by),
-                                headers=qry.req_headers,
+                                headers=kscfg.req_headers,
                                 name="put_item_3_fields_no_lsi")
         if resp.status_code == 200:
             key_3_fields_no_lsi_list.append(
@@ -76,7 +77,7 @@ class UserBehavior(locust.TaskSet):
 
         resp = self.client.post(req_url,
                                 qry.PUT_ITEM_3_FIELDS_1_LSI_RQ % (subject_key, post_by),
-                                headers=qry.req_headers,
+                                headers=kscfg.req_headers,
                                 name="put_item_3_fields_1_lsi")
         if resp.status_code == 200:
             key_3_fields_1_lsi_list.append({"Subject": subject_key, "LastPostedBy": post_by})
@@ -102,7 +103,7 @@ class UserBehavior(locust.TaskSet):
                                 addtional_field_1, addtional_field_2, addtional_field_3,
                                 addtional_field_4, addtional_field_5, addtional_field_6,
                                 addtional_field_7),
-                                headers=qry.req_headers,
+                                headers=kscfg.req_headers,
                                 name="put_item_10_fields_5_lsi")
         if resp.status_code == 200:
             key_10_fields_5_lsi_list.append(

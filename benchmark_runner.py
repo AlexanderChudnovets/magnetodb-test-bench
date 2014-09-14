@@ -56,6 +56,7 @@ class LocustBenchmarkRunner(BenchmarkRunner):
             bm_path = self.benchmark.__path__[0]
             put(bm_path, slave_path)
             if slave_ip != master_ip:
+                put(self.benchmark.config.TOKEN_PROJECT, self.benchmark.config.TOKEN_PROJECT)
                 put(self.benchmark.config.TABLE_LIST, self.benchmark.config.TABLE_LIST)
             self.runbg(cmd % ('%s/%s' % (slave_path, self.benchmark.__name__.split('.')[-1]), host, master_ip, master_port))
 
@@ -67,7 +68,13 @@ class LocustBenchmarkRunner(BenchmarkRunner):
     def setup(self):
         
         host = self.cfg.get('locust', 'host_to_test')
-        self.benchmark.setup(host)
+        keystone_url = self.cfg.get('keystone', 'keystone_url')
+        user = self.cfg.get('keystone', 'user')
+        password = self.cfg.get('keystone', 'password')
+        domain_name = self.cfg.get('keystone', 'domain_name')
+        project_name = self.cfg.get('keystone', 'project_name')
+
+        self.benchmark.setup(host, keystone_url, user, password, domain_name, project_name)
 
         requests_count = self.cfg.get('locust', 'requests_count')
         master_ip = self.cfg.get('locust', 'master_ip')
@@ -96,6 +103,7 @@ class LocustBenchmarkRunner(BenchmarkRunner):
     def cleanup(self):
         host = self.cfg.get('locust', 'host_to_test')
         self.benchmark.cleanup(host)
+
 
 class Monitor(object):
     def start(self):

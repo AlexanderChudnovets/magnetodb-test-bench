@@ -635,14 +635,3 @@ GET_TOKEN_RQ = '''
     }
 }
 '''
-
-req_headers = {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-    'X-Auth-Token': cfg.TOKEN
-}
-
-token_req_headers = {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-}

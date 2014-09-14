@@ -94,12 +94,31 @@ BATCH_WRITE_ITEM_KVAASLOADER_RQ = '''
 }
 '''
 
-req_headers = {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
+GET_TOKEN_RQ = '''
+{
+    "auth": {
+        "identity": {
+            "methods": [
+                "password"
+            ],
+            "password": {
+                "user": {
+                    "domain": {
+                        "name": "%s"
+                    },
+                    "name": "%s",
+                    "password": "%s"
+                }
+            }
+        },
+        "scope": {
+            "project": {
+                "domain": {
+                    "name": "%s"
+                },
+                "name": "%s"
+            }
+        }
+    }
 }
-
-token_req_headers = {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-}
+'''
