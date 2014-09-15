@@ -4,11 +4,12 @@ import locust
 from gevent import GreenletExit
 from locust import task
 import config as cfg
+import ks_config as kscfg
 import queries as qry
 
 MAX_EPOCH = 3333333333
 
-PROJECT_ID = cfg.PROJECT_ID
+PROJECT_ID = kscfg.PROJECT_ID
 
 
 class UserBehavior(locust.TaskSet):
@@ -63,7 +64,7 @@ class UserBehavior(locust.TaskSet):
                                                         path_id,
                                                         msu_id,
                                                         tags),
-                         headers=qry.req_headers,
+                         headers=kscfg.req_headers,
                          name="put_item_kvaasloader")
 
     @task(10)
@@ -106,7 +107,7 @@ class UserBehavior(locust.TaskSet):
 
         self.client.post(req_url,
                          qry.BATCH_WRITE_ITEM_KVAASLOADER_RQ % (table_name, req_body),
-                         headers=qry.req_headers,
+                         headers=kscfg.req_headers,
                          name="batch_write_item_kvaasloader")
 
 
