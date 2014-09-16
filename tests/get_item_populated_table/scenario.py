@@ -1,16 +1,12 @@
 import json
 import random
 import string
-
 import locust
 from gevent import GreenletExit
 from locust import task
-import ks_config as kscfg
 import config as cfg
+import ks_config as kscfg
 import queries as qry
-
-
-IS_FIRST_RUN = cfg.IS_FIRST_RUN
 
 table_3_fields_no_lsi_list = []
 table_3_fields_1_lsi_list = []
@@ -107,6 +103,7 @@ class MagnetoDBUser(locust.HttpLocust):
     max_wait = cfg.MAX_WAIT
 
 
+IS_FIRST_RUN = True
 # Master code
 def on_slave_report(client_id, data):
     global IS_FIRST_RUN

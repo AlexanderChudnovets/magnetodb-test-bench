@@ -35,6 +35,7 @@ def create_table_helper(host, project_id, table_name, body):
             else:
                 count += 1
                 time.sleep(1)
+    print "created table %s" % table_name
 
 
 def random_name(length):
@@ -131,12 +132,13 @@ def put_item_10_fields_5_lsi(host, project_id, table_10_fields_5_lsi_list, key_1
 
 
 def cassandra_cleanup():
-    my_env = os.environ.copy()
-    my_env['CASSANDRA_NODE_LIST'] = cfg.CASSANDRA_NODES
-    p = Popen([cfg.CASSANDRA_CLEANER, '-d'], stdout=PIPE,
-        stdin=PIPE, stderr=STDOUT, env=my_env)
-    stdout = p.communicate(input='y')[0]
-    print stdout
+    if os.path.isfile(cfg.CASSANDRA_CLEANER):
+        my_env = os.environ.copy()
+        my_env['CASSANDRA_NODE_LIST'] = cfg.CASSANDRA_NODES
+        p = Popen([cfg.CASSANDRA_CLEANER, '-d'], stdout=PIPE,
+            stdin=PIPE, stderr=STDOUT, env=my_env)
+        stdout = p.communicate(input='y')[0]
+        print stdout
 
 
 def get_token_project(keystone_url, user, password, domain_name, project_name):
@@ -167,7 +169,6 @@ def setup(host, keystone_url, user, password, domain_name, project_name):
     table_3_fields_1_lsi_list = []
     table_10_fields_5_lsi_list = []
 
-    print("Creating tables")
     create_tables(host, project_id,
                   table_3_fields_no_lsi_list,
                   table_3_fields_1_lsi_list,
