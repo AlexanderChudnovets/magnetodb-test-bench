@@ -1,9 +1,10 @@
-import importlib
 import random
 import string
 import json
 import requests
 import time
+import os
+from subprocess import Popen, PIPE, STDOUT
 import queries as qry
 import config as cfg
 import ks_config as kscfg
@@ -129,6 +130,15 @@ def put_item_10_fields_5_lsi(host, project_id, table_10_fields_5_lsi_list, key_1
              "AdditionalField4": addtional_field_4})
 
 
+def cassandra_cleanup():
+    my_env = os.environ.copy()
+    my_env['CASSANDRA_NODE_LIST'] = cfg.CASSANDRA_NODES
+    p = Popen([cfg.CASSANDRA_CLEANER, '-d'], stdout=PIPE,
+        stdin=PIPE, stderr=STDOUT, env=my_env)
+    stdout = p.communicate(input='y')[0]
+    print stdout
+
+
 def get_token_project(keystone_url, user, password, domain_name, project_name):
     body = qry.GET_TOKEN_RQ % (domain_name, user, password, domain_name, project_name)
     resp = requests.post(keystone_url, body, headers=cfg.token_req_headers)
@@ -142,12 +152,16 @@ def get_token_project(keystone_url, user, password, domain_name, project_name):
 
 
 def setup(host, keystone_url, user, password, domain_name, project_name):
+    print('Clean C*...')
+    cassandra_cleanup()
+
     print("Initializing ...")
     token, project_id = get_token_project(keystone_url, user, password,
                                           domain_name, project_name)
     kscfg.TOKEN = token
     kscfg.PROJECT_ID = project_id
     kscfg.req_headers['X-Auth-Token'] = token
+
 
     table_3_fields_no_lsi_list = []
     table_3_fields_1_lsi_list = []

@@ -13,9 +13,10 @@ from fabric.context_managers import settings, prefix, cd
 import uuid
 
 class BenchmarkRunner(object):
-    def __init__(self, results_dir, cfg, benchmark, monitor):
+    def __init__(self, results_dir, cfg_file, cfg, benchmark, monitor):
         self.results_dir = results_dir
         self.benchmark = benchmark
+        self.cfg_file = cfg_file
         self.cfg = cfg
         self.monitor = monitor
 
@@ -27,7 +28,18 @@ class BenchmarkRunner(object):
 
     def save_results(self):
         print "Store results"
-        os.rename(self.results_dir, '%s_%s' % (self.results_dir, get_timestamp()))
+        dst = os.path.join(self.results_dir, os.path.basename(self.cfg_file))
+        cmd = ['cp', '-p', self.cfg_file, dst]
+        subprocess.call(cmd, shell=False)
+
+        src = os.path.basename(self.benchmark.__path__[0])
+        dst = os.path.join(self.results_dir, src)
+        cmd = ['cp', '-pr', self.benchmark.__path__[0], dst]
+        subprocess.call(cmd, shell=False)
+
+        res = '%s_%s' % (self.results_dir, get_timestamp())
+        os.rename(self.results_dir, res)
+        print 'Stored results in', res
 
     def start_loading(self):
         print "Start loading..."
@@ -128,10 +140,10 @@ class CollectD(Monitor):
         section = section_mt.group()
         dir_rx = re.compile(r'DataDir\s+"[^"]*"')
         if dir_rx.search(section):
-            result = dir_rx.sub('DataDir "%s"' % self.rrd_dir, section)
+            result = dir_rx.sub('DataDir "%s"' % rrd_dir, section)
         else:
             result = section.replace('</Plugin>',
-                    '  DataDir "%s"\n</Plugin>' % self.rrd_dir)
+                    '  DataDir "%s"\n</Plugin>' % rrd_dir)
         with open(conf_file, 'w') as f:
             f.write(section_rx.sub(result, conf))
 
@@ -160,7 +172,7 @@ def get_timestamp():
     return datetime.datetime.now().isoformat().replace('.', '_').replace(':', '_')
 
 
-def main(config, benchmark):
+def main(conf_file, config, benchmark):
 
     base_dir = config.get('global', 'base_dir')
     prefix = config.get('global', 'result_dir_prefix')
@@ -172,7 +184,8 @@ def main(config, benchmark):
     if config.get('global', 'monitor') == 'collectd':
         mon = CollectD(rrd_dir)
     if config.get('global', 'loader') == 'locust':
-        runner = LocustBenchmarkRunner(results_dir, config, benchmark, mon)
+        runner = LocustBenchmarkRunner(results_dir, conf_file, config,
+            benchmark, mon)
     runner.run()
 
 if __name__ == '__main__':
@@ -186,4 +199,4 @@ if __name__ == '__main__':
     except ImportError:
         print "Benchmark is not a python package"
         sys.exit(-1)
-    main(conf, benchmark)
+    main(sys.argv[1], conf, benchmark)
