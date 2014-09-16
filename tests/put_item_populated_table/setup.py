@@ -6,8 +6,8 @@ import requests
 import time
 import queries as qry
 import config as cfg
+import ks_config as kscfg
 
-kscfg = None
 
 def create_table_helper(host, project_id, table_name, body):
     req_url = (host + '/v1/' +
@@ -145,14 +145,15 @@ def setup(host, keystone_url, user, password, domain_name, project_name):
     print("Initializing ...")
     token, project_id = get_token_project(keystone_url, user, password,
                                           domain_name, project_name)
-
-    global kscfg
-    kscfg = importlib.import_module("tests.put_item_populated_table.ks_config")
+    kscfg.TOKEN = token
+    kscfg.PROJECT_ID = project_id
+    kscfg.req_headers['X-Auth-Token'] = token
 
     table_3_fields_no_lsi_list = []
     table_3_fields_1_lsi_list = []
     table_10_fields_5_lsi_list = []
 
+    print("Creating tables")
     create_tables(host, project_id,
                   table_3_fields_no_lsi_list,
                   table_3_fields_1_lsi_list,
@@ -162,6 +163,7 @@ def setup(host, keystone_url, user, password, domain_name, project_name):
     key_3_fields_1_lsi_list = []
     key_10_fields_5_lsi_list = []
 
+    print("Populating tables")
     for i in xrange(cfg.ROWS_POPULATED):
         put_item_3_fields_no_lsi(host, project_id,
                                  table_3_fields_no_lsi_list,

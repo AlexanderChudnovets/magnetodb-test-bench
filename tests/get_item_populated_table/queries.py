@@ -1,10 +1,3 @@
-import json
-import config as cfg
-
-TABLE_LIST = '/tmp/table_list.txt'
-ITEM_KEY_LIST = '/tmp/item_key_list.txt'
-TOKEN_PROJECT = '/tmp/token_project.txt'
-
 CREATE_TABLE_3_FIELDS_NO_LSI_RQ = '''
 {
     "table_name": "%s",
@@ -638,14 +631,3 @@ GET_TOKEN_RQ = '''
     }
 }
 '''
-
-req_headers = {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-    'X-Auth-Token': cfg.TOKEN
-}
-
-token_req_headers = {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-}
