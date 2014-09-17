@@ -1,7 +1,3 @@
-import json
-import config as cfg
-
-
 CREATE_TABLE_3_FIELDS_NO_LSI_RQ = '''
 {
     "table_name": "%s",

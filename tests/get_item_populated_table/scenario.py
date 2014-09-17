@@ -3,14 +3,10 @@ import random
 import string
 import locust
 from gevent import GreenletExit
-from locust.events import EventHook
 from locust import task
-
 import config as cfg
+import ks_config as kscfg
 import queries as qry
-
-
-IS_FIRST_RUN = cfg.IS_FIRST_RUN
 
 table_3_fields_no_lsi_list = []
 table_3_fields_1_lsi_list = []
@@ -20,7 +16,7 @@ key_3_fields_no_lsi_list = []
 key_3_fields_1_lsi_list = []
 key_10_fields_5_lsi_list = []
 
-PROJECT_ID = qry.PROJECT_ID
+PROJECT_ID = kscfg.PROJECT_ID
 
 
 class UserBehavior(locust.TaskSet):
@@ -49,7 +45,7 @@ class UserBehavior(locust.TaskSet):
         global table_3_fields_1_lsi_list
         global table_10_fields_5_lsi_list
 
-        with open(qry.TABLE_LIST) as table_list_file:
+        with open(cfg.TABLE_LIST) as table_list_file:
             table_list = json.load(table_list_file)
             table_3_fields_no_lsi_list = table_list['table_3_fields_no_lsi']
             table_3_fields_1_lsi_list = table_list['table_3_fields_1_lsi']
@@ -60,7 +56,7 @@ class UserBehavior(locust.TaskSet):
         global key_3_fields_1_lsi_list
         global key_10_fields_5_lsi_list
 
-        with open(qry.ITEM_KEY_LIST) as item_key_list_file:
+        with open(cfg.ITEM_KEY_LIST) as item_key_list_file:
             item_key_list = json.load(item_key_list_file)
             key_3_fields_no_lsi_list = item_key_list['key_3_fields_no_lsi']
             key_3_fields_1_lsi_list = item_key_list['key_3_fields_1_lsi']
@@ -75,7 +71,7 @@ class UserBehavior(locust.TaskSet):
         if len(key_3_fields_no_lsi_list) > 0:
             attribute_key = random.choice(key_3_fields_no_lsi_list)
             subject_key = attribute_key["Subject"]
-            self.client.post(req_url, qry.GET_ITEM_3_FIELDS_NO_LSI_RQ % subject_key, headers=qry.req_headers, name="get_item_3_fields_no_lsi")
+            self.client.post(req_url, qry.GET_ITEM_3_FIELDS_NO_LSI_RQ % subject_key, headers=kscfg.req_headers, name="get_item_3_fields_no_lsi")
 
 
     @task(10)
@@ -87,7 +83,7 @@ class UserBehavior(locust.TaskSet):
         if len(key_3_fields_1_lsi_list) > 0:
             attribute_key = random.choice(key_3_fields_1_lsi_list)
             subject_key = attribute_key["Subject"]
-            self.client.post(req_url, qry.GET_ITEM_3_FIELDS_1_LSI_RQ % subject_key, headers=qry.req_headers, name="get_item_3_fields_1_lsi")
+            self.client.post(req_url, qry.GET_ITEM_3_FIELDS_1_LSI_RQ % subject_key, headers=kscfg.req_headers, name="get_item_3_fields_1_lsi")
 
     @task(10)
     def get_item_10_fields_5_lsi(self):
@@ -98,7 +94,7 @@ class UserBehavior(locust.TaskSet):
         if len(key_10_fields_5_lsi_list) > 0:
             attribute_key = random.choice(key_10_fields_5_lsi_list)
             subject_key = attribute_key["Subject"]
-            self.client.post(req_url, qry.GET_ITEM_10_FIELDS_5_LSI_RQ % subject_key, headers=qry.req_headers, name="get_item_10_fields_5_lsi")
+            self.client.post(req_url, qry.GET_ITEM_10_FIELDS_5_LSI_RQ % subject_key, headers=kscfg.req_headers, name="get_item_10_fields_5_lsi")
 
 
 class MagnetoDBUser(locust.HttpLocust):
@@ -107,6 +103,7 @@ class MagnetoDBUser(locust.HttpLocust):
     max_wait = cfg.MAX_WAIT
 
 
+IS_FIRST_RUN = True
 # Master code
 def on_slave_report(client_id, data):
     global IS_FIRST_RUN
