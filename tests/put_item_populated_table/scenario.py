@@ -120,6 +120,7 @@ class MagnetoDBUser(locust.HttpLocust):
     min_wait = cfg.MIN_WAIT
     max_wait = cfg.MAX_WAIT
 
+
 IS_FIRST_RUN = True
 # Master code
 def on_slave_report(client_id, data):

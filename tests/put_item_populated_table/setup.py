@@ -164,7 +164,6 @@ def setup(host, keystone_url, user, password, domain_name, project_name):
     kscfg.PROJECT_ID = project_id
     kscfg.req_headers['X-Auth-Token'] = token
 
-
     table_3_fields_no_lsi_list = []
     table_3_fields_1_lsi_list = []
     table_10_fields_5_lsi_list = []

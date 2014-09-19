@@ -8,10 +8,10 @@ from locust.events import EventHook
 from locust import task
 
 import config as cfg
+import ks_config as kscfg
 import queries as qry
 
-IS_FIRST_RUN = cfg.IS_FIRST_RUN
-PROJECT_ID = qry.PROJECT_ID
+PROJECT_ID = kscfg.PROJECT_ID
 
 table_name_set = set()
 
@@ -21,8 +21,8 @@ class UserBehavior(locust.TaskSet):
         pass
 
     def on_stop(self):
-        # self.dump_tables_created()
-        self.delete_all_tables()
+        self.dump_tables_created()
+        #self.delete_all_tables()
 
     def run(self, *args, **kwargs):
         try:
@@ -40,19 +40,19 @@ class UserBehavior(locust.TaskSet):
         req_url = ('/v1/' +
                    PROJECT_ID +
                    '/data/tables')
-        self.client.post(req_url, body, headers=qry.req_headers, name=name)
+        self.client.post(req_url, body, headers=kscfg.req_headers, name=name)
 
         while True:
             req_url = ('/v1/' +
                        PROJECT_ID +
                        '/data/tables/' + table_name)
-            resp = self.client.get(req_url, headers=qry.req_headers,
+            resp = self.client.get(req_url, headers=kscfg.req_headers,
                                    name="describe_table_helper_ignore")
             if resp.status_code != 200 or "ACTIVE" in resp.content:
                 table_name_set.add(table_name)
                 break
             else:
-                time.sleep(0.01)
+                time.sleep(1)
 
     @task(1)
     def create_table_3_fields_no_lsi(self):
@@ -61,7 +61,7 @@ class UserBehavior(locust.TaskSet):
         req_url = ('/v1/' +
                    PROJECT_ID +
                    '/data/tables/' + table_name)
-        resp = self.client.get(req_url, headers=qry.req_headers,
+        resp = self.client.get(req_url, headers=kscfg.req_headers,
                                name="describe_table_helper_ignore")
         if resp.status_code == 400 and "already exists" in resp.content:
             return
@@ -76,7 +76,7 @@ class UserBehavior(locust.TaskSet):
         req_url = ('/v1/' +
                    PROJECT_ID +
                    '/data/tables/' + table_name)
-        resp = self.client.get(req_url, headers=qry.req_headers,
+        resp = self.client.get(req_url, headers=kscfg.req_headers,
                                name="describe_table_helper_ignore")
         if resp.status_code == 400 and "already exists" in resp.content:
             return
@@ -91,7 +91,7 @@ class UserBehavior(locust.TaskSet):
         req_url = ('/v1/' +
                    PROJECT_ID +
                    '/data/tables/' + table_name)
-        resp = self.client.get(req_url, headers=qry.req_headers,
+        resp = self.client.get(req_url, headers=kscfg.req_headers,
                                name="describe_table_helper_ignore")
         if resp.status_code == 400 and "already exists" in resp.content:
             return
@@ -107,7 +107,7 @@ class UserBehavior(locust.TaskSet):
                    PROJECT_ID +
                    '/data/tables/' + table_name)
         resp = self.client.get(req_url,
-                               headers=qry.req_headers,
+                               headers=kscfg.req_headers,
                                name="describe_table_helper_ignore")
         if resp.status_code == 400 and "already exists" in resp.content:
             return
@@ -120,14 +120,14 @@ class UserBehavior(locust.TaskSet):
                    PROJECT_ID +
                    '/data/tables/' + table_name)
         self.client.delete(req_url,
-                           headers=qry.req_headers,
+                           headers=kscfg.req_headers,
                            name="delete_table")
         while True:
             req_url = ('/v1/' +
                        PROJECT_ID +
                        '/data/tables/' + table_name)
             resp = self.client.get(req_url,
-                                   headers=qry.req_headers,
+                                   headers=kscfg.req_headers,
                                    name="describe_table_helper_ignore")
             if resp.status_code != 200:
                 table_name_set.discard(table_name)
@@ -135,35 +135,11 @@ class UserBehavior(locust.TaskSet):
             else:
                 time.sleep(1)
 
-    @task(1)
-    def delete_table(self):
-        if len(table_name_set) > 0:
-            table_name = random.sample(table_name_set, 1)[0]
-            req_url = ('/v1/' +
-                       PROJECT_ID +
-                       '/data/tables/' + table_name)
-            resp = self.client.get(req_url, headers=qry.req_headers,
-                                   name="describe_table_helper_ignore")
-            if resp.status_code != 200 or "DELETING" in resp.content:
-                return
-
-            self.delete_table_util(table_name)
-
-    @task(10)
-    def describe_table(self):
-        if len(table_name_set) > 0:
-            table_name = random.sample(table_name_set, 1)[0]
-            req_url = ('/v1/' +
-                       PROJECT_ID +
-                       '/data/tables/' + table_name)
-            self.client.get(req_url, headers=qry.req_headers,
-                            name="describe_table")
-
     def dump_tables_created(self):
         tables = {
             "tables": list(table_name_set)
         }
-        with open(qry.TABLE_LIST, 'w') as table_files:
+        with open(cfg.TABLE_LIST, 'w') as table_files:
             json.dump(tables, table_files)
 
     def delete_all_tables(self):
@@ -171,7 +147,7 @@ class UserBehavior(locust.TaskSet):
             req_url = ('/v1/' +
                        PROJECT_ID +
                        '/data/tables/' + table_name)
-            resp = self.client.get(req_url, headers=qry.req_headers,
+            resp = self.client.get(req_url, headers=kscfg.req_headers,
                                    name="describe_table_helper_ignore")
             if resp.status_code != 200 or "DELETING" in resp.content:
                 continue
@@ -183,6 +159,9 @@ class MagnetoDBUser(locust.HttpLocust):
     task_set = UserBehavior
     min_wait = cfg.MIN_WAIT
     max_wait = cfg.MAX_WAIT
+
+
+IS_FIRST_RUN = True
 
 
 # Master code

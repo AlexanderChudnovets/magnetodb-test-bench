@@ -3,8 +3,8 @@ import time
 
 import requests
 
-import ks_config as kscfg
 import config as cfg
+import ks_config as kscfg
 
 
 def cleanup(host):
