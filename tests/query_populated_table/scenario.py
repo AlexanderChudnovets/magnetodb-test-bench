@@ -1,14 +1,14 @@
 import json
 import random
 import string
+
 import locust
 from gevent import GreenletExit
-from locust.events import EventHook
 from locust import task
 import config as cfg
+import ks_config as kscfg
 import queries as qry
 
-IS_FIRST_RUN = cfg.IS_FIRST_RUN
 
 table_3_fields_no_lsi_list = []
 table_3_fields_1_lsi_list = []
@@ -18,7 +18,7 @@ key_3_fields_no_lsi_list = []
 key_3_fields_1_lsi_list = []
 key_10_fields_5_lsi_list = []
 
-PROJECT_ID = qry.PROJECT_ID
+PROJECT_ID = kscfg.PROJECT_ID
 
 
 class UserBehavior(locust.TaskSet):
@@ -46,7 +46,7 @@ class UserBehavior(locust.TaskSet):
         global table_3_fields_1_lsi_list
         global table_10_fields_5_lsi_list
 
-        with open(qry.TABLE_LIST) as table_list_file:
+        with open(cfg.TABLE_LIST) as table_list_file:
             table_list = json.load(table_list_file)
             table_3_fields_no_lsi_list = table_list['table_3_fields_no_lsi']
             table_3_fields_1_lsi_list = table_list['table_3_fields_1_lsi']
@@ -57,7 +57,7 @@ class UserBehavior(locust.TaskSet):
         global key_3_fields_1_lsi_list
         global key_10_fields_5_lsi_list
 
-        with open(qry.ITEM_KEY_LIST) as item_key_list_file:
+        with open(cfg.ITEM_KEY_LIST) as item_key_list_file:
             item_key_list = json.load(item_key_list_file)
             key_3_fields_no_lsi_list = item_key_list['key_3_fields_no_lsi']
             key_3_fields_1_lsi_list = item_key_list['key_3_fields_1_lsi']
@@ -71,7 +71,7 @@ class UserBehavior(locust.TaskSet):
                    '/data/tables/' + table_name + '/query')
         self.client.post(req_url,
                          qry.QUERY_3_FIELDS_NO_LSI_RQ1,
-                         headers=qry.req_headers,
+                         headers=kscfg.req_headers,
                          name="query_hash_only")
 
     @task(1)
@@ -82,7 +82,7 @@ class UserBehavior(locust.TaskSet):
                    '/data/tables/' + table_name + '/query')
         self.client.post(req_url,
                          qry.QUERY_3_FIELDS_1_LSI_RQ1,
-                         headers=qry.req_headers,
+                         headers=kscfg.req_headers,
                          name="query_hash_only")
 
     @task(5)
@@ -96,7 +96,7 @@ class UserBehavior(locust.TaskSet):
             post_by = attribute_key["LastPostedBy"]
             self.client.post(req_url,
                              qry.QUERY_3_FIELDS_1_LSI_RQ2 % post_by,
-                             headers=qry.req_headers,
+                             headers=kscfg.req_headers,
                              name="query_hash_range")
 
     @task(1)
@@ -107,7 +107,7 @@ class UserBehavior(locust.TaskSet):
                    '/data/tables/' + table_name + '/query')
         self.client.post(req_url,
                          qry.QUERY_10_FIELDS_5_LSI_RQ1,
-                         headers=qry.req_headers,
+                         headers=kscfg.req_headers,
                          name="query_hash_only")
 
     @task(5)
@@ -121,7 +121,7 @@ class UserBehavior(locust.TaskSet):
             post_by = attribute_key["LastPostedBy"]
             self.client.post(req_url,
                              qry.QUERY_10_FIELDS_5_LSI_RQ2 % post_by,
-                             headers=qry.req_headers,
+                             headers=kscfg.req_headers,
                              name="query_hash_range")
 
     @task(5)
@@ -135,7 +135,7 @@ class UserBehavior(locust.TaskSet):
             addtional_field_1 = attribute_key["AdditionalField1"]
             self.client.post(req_url,
                              qry.QUERY_10_FIELDS_5_LSI_RQ3 % addtional_field_1,
-                             headers=qry.req_headers,
+                             headers=kscfg.req_headers,
                              name="query_hash_range")
 
     @task(5)
@@ -149,7 +149,7 @@ class UserBehavior(locust.TaskSet):
             addtional_field_2 = attribute_key["AdditionalField2"]
             self.client.post(req_url,
                              qry.QUERY_10_FIELDS_5_LSI_RQ4 % addtional_field_2,
-                             headers=qry.req_headers,
+                             headers=kscfg.req_headers,
                              name="query_hash_range")
 
     @task(5)
@@ -163,7 +163,7 @@ class UserBehavior(locust.TaskSet):
             addtional_field_3 = attribute_key["AdditionalField3"]
             self.client.post(req_url,
                              qry.QUERY_10_FIELDS_5_LSI_RQ5 % addtional_field_3,
-                             headers=qry.req_headers,
+                             headers=kscfg.req_headers,
                              name="query_hash_range")
 
     @task(5)
@@ -177,7 +177,7 @@ class UserBehavior(locust.TaskSet):
             addtional_field_4 = attribute_key["AdditionalField4"]
             self.client.post(req_url,
                              qry.QUERY_10_FIELDS_5_LSI_RQ6 % addtional_field_4,
-                             headers=qry.req_headers,
+                             headers=kscfg.req_headers,
                              name="query_hash_range")
 
 
@@ -185,6 +185,8 @@ class MagnetoDBUser(locust.HttpLocust):
     task_set = UserBehavior
     min_wait = cfg.MIN_WAIT
     max_wait = cfg.MAX_WAIT
+
+IS_FIRST_RUN = True
 
 
 # Master code
