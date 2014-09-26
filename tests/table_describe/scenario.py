@@ -77,7 +77,7 @@ def on_slave_report(client_id, data):
         runner.start_hatching(cfg.LOCUST_COUNT, cfg.HATCH_RATE)
         IS_FIRST_RUN = False
 
-    num_rq = sum([val.num_requests for val in
+    num_rq = sum([val.num_requests + val.num_failures for val in
                   runner.request_stats.itervalues()])
     if runner.num_requests and num_rq >= runner.num_requests:
         raise KeyboardInterrupt()
