@@ -191,15 +191,37 @@ def main(conf_file, config, benchmark):
             benchmark, mon)
     runner.run()
 
-if __name__ == '__main__':
-    if len(sys.argv) < 3:
-        print "Usage: %s /path/to/config /path/to/benchmark" % sys.argv[0]
-        sys.exit(-1)
-    conf = ConfigParser.ConfigParser()
-    conf.read(sys.argv[1])
+
+def run_benchmark(config_file, config, testcase):
     try:
-        benchmark = importlib.import_module(sys.argv[2])
+        benchmark = importlib.import_module(testcase)
     except ImportError:
         print "Benchmark is not a python package"
         sys.exit(-1)
-    main(sys.argv[1], conf, benchmark)
+    main(config_file, config, benchmark)
+
+
+if __name__ == '__main__':
+    if len(sys.argv) < 3:
+        print "Usage: %s /path/to/config /path/to/benchmark" % sys.argv[0]
+        print "or %s /path/to/config /path/to/benchmark /path/to/conf.template /path/to/cases.json" % sys.argv[0]
+        sys.exit(-1)
+    conf = ConfigParser.ConfigParser()
+    conf.read(sys.argv[1])
+
+    if len(sys.argv) == 5:
+        cases = json.load(sys.argv[4])
+        with open(sys.argv[3], 'r') as f:
+            template = f.read()
+        for case in cases:
+            config = template
+            for key in case:
+                config = config.replace('{{%s}}' % key, case[key])
+            with open(os.path.join(sys.argv[2], 'config.py', 'w') as f:
+                f.write(config)
+            try:
+                run_benchmark(sys.argv[1], conf, sys.argv[2])
+            except KeyboardInterrupt:
+                pass
+    else:
+        run_benchmark(sys.argv[1], conf, sys.argv[2])
