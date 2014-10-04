@@ -60,25 +60,29 @@ class UserBehavior(locust.TaskSet):
     ########## Update Item: insert new, put action, 1 attribute to be updated,
     # without expected conditions, return none
     @task(1)
-    def update_item_new_item_1_attr_no_expected_return_none_10_fields_no_lsi(
+    def update_item_new_item_1_attr_no_expected_return_none_10_fields(
             self):
-        table_name = random.choice(table_10_fields_no_lsi_list)
+        table_name = random.choice(table_10_fields_no_lsi_list
+                                   if cfg.NO_LSI else table_10_fields_1_lsi_list)
+        query = qry.UPDATE_ITEM_1_ATTR_NO_EXPECTED_RETURN_NONE_10_FIELDS_NO_LSI_RQ if cfg.NO_LSI else qry.UPDATE_ITEM_1_ATTR_NO_EXPECTED_RETURN_NONE_10_FIELDS_1_LSI_RQ
         req_url = ('/v1/' +
                    PROJECT_ID +
                    '/data/tables/' + table_name + '/update_item')
         subject_key = self.random_name(20)
         last_postby = self.random_name(20)
         self.client.post(req_url,
-                         qry.UPDATE_ITEM_1_ATTR_NO_EXPECTED_RETURN_NONE_10_FIELDS_NO_LSI_RQ % (subject_key, last_postby),
+                         query % (subject_key, last_postby),
                          headers=kscfg.req_headers,
-                         name="update_item_new_item_1_attr_no_expected_return_none_10_fields_no_lsi")
+                         name="update_item_new_item_1_attr_no_expected_return_none_10_fields")
 
     ########## Update Item: insert new, put action, 5 attributes to be updated,
     # without expected conditions, return none
     @task(1)
-    def update_item_new_item_5_attr_no_expected_return_none_10_fields_no_lsi(
+    def update_item_new_item_5_attr_no_expected_return_none_10_fields(
             self):
-        table_name = random.choice(table_10_fields_no_lsi_list)
+        table_name = random.choice(table_10_fields_no_lsi_list
+                                   if cfg.NO_LSI else table_10_fields_1_lsi_list)
+        query = qry.UPDATE_ITEM_5_ATTR_NO_EXPECTED_RETURN_NONE_10_FIELDS_NO_LSI_RQ if cfg.NO_LSI else qry.UPDATE_ITEM_5_ATTR_NO_EXPECTED_RETURN_NONE_10_FIELDS_1_LSI_RQ
         req_url = ('/v1/' +
                    PROJECT_ID +
                    '/data/tables/' + table_name + '/update_item')
@@ -89,87 +93,102 @@ class UserBehavior(locust.TaskSet):
         additional_field_3 = self.random_name(20)
         additional_field_4 = self.random_name(20)
         self.client.post(req_url,
-                         qry.UPDATE_ITEM_5_ATTR_NO_EXPECTED_RETURN_NONE_10_FIELDS_NO_LSI_RQ % (
+                         query % (
                              subject_key, last_postby, additional_field_1,
                          additional_field_2, additional_field_3,
                          additional_field_4),
                          headers=kscfg.req_headers,
-                         name="update_item_new_item_5_attr_no_expected_return_none_10_fields_no_lsi")
+                         name="update_item_new_item_5_attr_no_expected_return_none_10_fields")
 
     ########## Update Item: update existing, put action, 1 attribute to be updated  #############
     ##########              with or w/o expected conditions, return none or all_old #############
     @task(1)
-    def update_item_existing_1_attr_no_expected_return_none_10_fields_no_lsi(self):
-        table_name = random.choice(table_10_fields_no_lsi_list)
+    def update_item_existing_1_attr_no_expected_return_none_10_fields(self):
+        table_name = random.choice(table_10_fields_no_lsi_list
+                                   if cfg.NO_LSI else table_10_fields_1_lsi_list)
         req_url = ('/v1/' +
                    PROJECT_ID +
                    '/data/tables/' + table_name + '/update_item')
-        if len(key_10_fields_no_lsi_list) > 0:
-            attribute_key = random.choice(key_10_fields_no_lsi_list)
+        key_list = key_10_fields_no_lsi_list if cfg.NO_LSI else key_10_fields_1_lsi_list
+        query = qry.UPDATE_ITEM_1_ATTR_NO_EXPECTED_RETURN_NONE_10_FIELDS_NO_LSI_RQ if cfg.NO_LSI else qry.UPDATE_ITEM_1_ATTR_NO_EXPECTED_RETURN_NONE_10_FIELDS_1_LSI_RQ
+        if len(key_list) > 0:
+            attribute_key = random.choice(key_list)
             subject_key = attribute_key["Subject"]
             last_postby = self.random_name(20)
-            self.client.post(req_url, qry.UPDATE_ITEM_1_ATTR_NO_EXPECTED_RETURN_NONE_10_FIELDS_NO_LSI_RQ % (subject_key, last_postby),
-                             headers=kscfg.req_headers, name="update_item_existing_1_attr_no_expected_return_none_10_fields_no_lsi")
+            self.client.post(req_url, query % (subject_key, last_postby),
+                             headers=kscfg.req_headers, name="update_item_existing_1_attr_no_expected_return_none_10_fields")
 
 
     @task(1)
-    def update_item_existing_1_attr_no_expected_return_all_old_10_fields_no_lsi(self):
-        table_name = random.choice(table_10_fields_no_lsi_list)
+    def update_item_existing_1_attr_no_expected_return_all_old_10_fields(self):
+        table_name = random.choice(table_10_fields_no_lsi_list
+                                   if cfg.NO_LSI else table_10_fields_1_lsi_list)
         req_url = ('/v1/' +
                    PROJECT_ID +
                    '/data/tables/' + table_name + '/update_item')
-        if len(key_10_fields_no_lsi_list) > 0:
-            attribute_key = random.choice(key_10_fields_no_lsi_list)
+        key_list = key_10_fields_no_lsi_list if cfg.NO_LSI else key_10_fields_1_lsi_list
+        query = qry.UPDATE_ITEM_1_ATTR_NO_EXPECTED_RETURN_ALL_OLD_10_FIELDS_NO_LSI_RQ if cfg.NO_LSI else qry.UPDATE_ITEM_1_ATTR_NO_EXPECTED_RETURN_ALL_OLD_10_FIELDS_1_LSI_RQ
+        if len(key_list) > 0:
+            attribute_key = random.choice(key_list)
             subject_key = attribute_key["Subject"]
             last_postby = self.random_name(20)
-            self.client.post(req_url, qry.UPDATE_ITEM_1_ATTR_NO_EXPECTED_RETURN_ALL_OLD_10_FIELDS_NO_LSI_RQ % (subject_key, last_postby),
-                             headers=kscfg.req_headers, name="update_item_existing_1_attr_no_expected_return_all_old_10_fields_no_lsi")
+            self.client.post(req_url, query % (subject_key, last_postby),
+                             headers=kscfg.req_headers, name="update_item_existing_1_attr_no_expected_return_all_old_10_fields")
 
 
     @task(1)
-    def update_item_existing_1_attr_1_expected_return_none_10_fields_no_lsi(self):
-        table_name = random.choice(table_10_fields_no_lsi_list)
+    def update_item_existing_1_attr_1_expected_return_none_10_fields(self):
+        table_name = random.choice(table_10_fields_no_lsi_list
+                                   if cfg.NO_LSI else table_10_fields_1_lsi_list)
+        key_list = key_10_fields_no_lsi_list if cfg.NO_LSI else key_10_fields_1_lsi_list
         req_url = ('/v1/' +
                    PROJECT_ID +
                    '/data/tables/' + table_name + '/update_item')
-        if len(key_10_fields_no_lsi_list) > 0:
-            attribute_key = random.choice(key_10_fields_no_lsi_list)
+        query = qry.UPDATE_ITEM_1_ATTR_1_EXPECTED_RETURN_NONE_10_FIELDS_NO_LSI_RQ if cfg.NO_LSI else qry.UPDATE_ITEM_1_ATTR_1_EXPECTED_RETURN_NONE_10_FIELDS_1_LSI_RQ
+        if len(key_list) > 0:
+            attribute_key = random.choice(key_list)
             subject_key = attribute_key["Subject"]
             last_postby_expected = attribute_key["LastPostedBy"]
             last_postby = self.random_name(20)
-            resp = self.client.post(req_url, qry.UPDATE_ITEM_1_ATTR_1_EXPECTED_RETURN_NONE_10_FIELDS_NO_LSI_RQ % (
+            resp = self.client.post(req_url, query % (
                 subject_key, last_postby, last_postby_expected),
                 headers=kscfg.req_headers,
-                name="update_item_existing_1_attr_1_expected_return_none_10_fields_no_lsi")
+                name="update_item_existing_1_attr_1_expected_return_none_10_fields")
             if resp.status_code == 200:
                 attribute_key["LastPostedBy"] = last_postby
 
     @task(1)
-    def update_item_existing_1_attr_1_expected_return_all_old_10_fields_no_lsi(self):
-        table_name = random.choice(table_10_fields_no_lsi_list)
+    def update_item_existing_1_attr_1_expected_return_all_old_10_fields(self):
+        table_name = random.choice(table_10_fields_no_lsi_list
+                                   if cfg.NO_LSI else table_10_fields_1_lsi_list)
+        key_list = key_10_fields_no_lsi_list if cfg.NO_LSI else key_10_fields_1_lsi_list
+        query = qry.UPDATE_ITEM_1_ATTR_1_EXPECTED_RETURN_ALL_OLD_10_FIELDS_NO_LSI_RQ if cfg.NO_LSI else qry.UPDATE_ITEM_1_ATTR_1_EXPECTED_RETURN_ALL_OLD_10_FIELDS_1_LSI_RQ
         req_url = ('/v1/' +
                    PROJECT_ID +
                    '/data/tables/' + table_name + '/update_item')
-        if len(key_10_fields_no_lsi_list) > 0:
-            attribute_key = random.choice(key_10_fields_no_lsi_list)
+        if len(key_list) > 0:
+            attribute_key = random.choice(key_list)
             subject_key = attribute_key["Subject"]
             last_postby_expected = attribute_key["LastPostedBy"]
             last_postby = self.random_name(20)
-            resp = self.client.post(req_url, qry.UPDATE_ITEM_1_ATTR_1_EXPECTED_RETURN_ALL_OLD_10_FIELDS_NO_LSI_RQ % (subject_key, last_postby, last_postby_expected),
-                                    headers=kscfg.req_headers, name="update_item_existing_1_attr_1_expected_return_all_old_10_fields_no_lsi")
+            resp = self.client.post(req_url, query % (subject_key, last_postby, last_postby_expected),
+                                    headers=kscfg.req_headers, name="update_item_existing_1_attr_1_expected_return_all_old_10_fields")
             if resp.status_code == 200:
                 attribute_key["LastPostedBy"] = last_postby
 
     ########## Update Item: update existing, put action, 5 attributes to be updated:#############
     ##########              with or w/o expected conditions, return none or all_old #############
     @task(1)
-    def update_item_existing_5_attr_no_expected_return_none_10_fields_no_lsi(self):
-        table_name = random.choice(table_10_fields_no_lsi_list)
+    def update_item_existing_5_attr_no_expected_return_none_10_fields(self):
+        table_name = random.choice(table_10_fields_no_lsi_list
+                                   if cfg.NO_LSI else table_10_fields_1_lsi_list)
+        key_list = key_10_fields_no_lsi_list if cfg.NO_LSI else key_10_fields_1_lsi_list
+        query = qry.UPDATE_ITEM_5_ATTR_NO_EXPECTED_RETURN_NONE_10_FIELDS_NO_LSI_RQ if cfg.NO_LSI else qry.UPDATE_ITEM_5_ATTR_NO_EXPECTED_RETURN_NONE_10_FIELDS_1_LSI_RQ
         req_url = ('/v1/' +
                    PROJECT_ID +
                    '/data/tables/' + table_name + '/update_item')
-        if len(key_10_fields_no_lsi_list) > 0:
-            attribute_key = random.choice(key_10_fields_no_lsi_list)
+        if len(key_list) > 0:
+            attribute_key = random.choice(key_list)
             subject_key = attribute_key["Subject"]
             last_postby = self.random_name(20)
             additional_field_1 = self.random_name(20)
@@ -178,21 +197,24 @@ class UserBehavior(locust.TaskSet):
             additional_field_4 = self.random_name(20)
 
             self.client.post(req_url,
-                             qry.UPDATE_ITEM_5_ATTR_NO_EXPECTED_RETURN_NONE_10_FIELDS_NO_LSI_RQ % (
+                             query % (
                                  subject_key, last_postby, additional_field_1, additional_field_2, additional_field_3,
                                  additional_field_4),
                              headers=kscfg.req_headers,
-                             name="update_item_existing_5_attr_no_expected_return_none_10_fields_no_lsi")
+                             name="update_item_existing_5_attr_no_expected_return_none_10_fields")
 
 
     @task(1)
-    def update_item_existing_5_attr_no_expected_return_all_old_10_fields_no_lsi(self):
-        table_name = random.choice(table_10_fields_no_lsi_list)
+    def update_item_existing_5_attr_no_expected_return_all_old_10_fields(self):
+        table_name = random.choice(table_10_fields_no_lsi_list
+                                   if cfg.NO_LSI else table_10_fields_1_lsi_list)
+        key_list = key_10_fields_no_lsi_list if cfg.NO_LSI else key_10_fields_1_lsi_list
+        query = qry.UPDATE_ITEM_5_ATTR_NO_EXPECTED_RETURN_ALL_OLD_10_FIELDS_NO_LSI_RQ if cfg.NO_LSI else qry.UPDATE_ITEM_5_ATTR_NO_EXPECTED_RETURN_ALL_OLD_10_FIELDS_1_LSI_RQ
         req_url = ('/v1/' +
                    PROJECT_ID +
                    '/data/tables/' + table_name + '/update_item')
-        if len(key_10_fields_no_lsi_list) > 0:
-            attribute_key = random.choice(key_10_fields_no_lsi_list)
+        if len(key_list) > 0:
+            attribute_key = random.choice(key_list)
             subject_key = attribute_key["Subject"]
             last_postby = self.random_name(20)
             additional_field_1 = self.random_name(20)
@@ -200,21 +222,24 @@ class UserBehavior(locust.TaskSet):
             additional_field_3 = self.random_name(20)
             additional_field_4 = self.random_name(20)
             self.client.post(req_url,
-                             qry.UPDATE_ITEM_5_ATTR_NO_EXPECTED_RETURN_ALL_OLD_10_FIELDS_NO_LSI_RQ % (
+                             query % (
                                  subject_key, last_postby, additional_field_1, additional_field_2, additional_field_3,
                                  additional_field_4),
                              headers=kscfg.req_headers,
-                             name="update_item_existing_5_attr_no_expected_return_all_old_10_fields_no_lsi")
+                             name="update_item_existing_5_attr_no_expected_return_all_old_10_fields")
 
 
     @task(1)
-    def update_item_existing_5_attr_5_expected_return_none_10_fields_no_lsi(self):
-        table_name = random.choice(table_10_fields_no_lsi_list)
+    def update_item_existing_5_attr_5_expected_return_none_10_fields(self):
+        table_name = random.choice(table_10_fields_no_lsi_list
+                                   if cfg.NO_LSI else table_10_fields_1_lsi_list)
+        key_list = key_10_fields_no_lsi_list if cfg.NO_LSI else key_10_fields_1_lsi_list
+        query = qry.UPDATE_ITEM_5_ATTR_5_EXPECTED_RETURN_NONE_10_FIELDS_NO_LSI_RQ if cfg.NO_LSI else qry.UPDATE_ITEM_5_ATTR_5_EXPECTED_RETURN_NONE_10_FIELDS_1_LSI_RQ
         req_url = ('/v1/' +
                    PROJECT_ID +
                    '/data/tables/' + table_name + '/update_item')
-        if len(key_10_fields_no_lsi_list) > 0:
-            attribute_key = random.choice(key_10_fields_no_lsi_list)
+        if len(key_list) > 0:
+            attribute_key = random.choice(key_list)
             subject_key = attribute_key["Subject"]
             last_postby_expected = attribute_key["LastPostedBy"]
             last_postby = self.random_name(20)
@@ -228,7 +253,7 @@ class UserBehavior(locust.TaskSet):
             additional_field_4 = self.random_name(20)
 
             resp = self.client.post(req_url,
-                                    qry.UPDATE_ITEM_5_ATTR_5_EXPECTED_RETURN_NONE_10_FIELDS_NO_LSI_RQ % (
+                                    query % (
                                     subject_key,
                                     last_postby,
                                     additional_field_1,
@@ -242,7 +267,7 @@ class UserBehavior(locust.TaskSet):
                                     additional_field_4_expected
                                 ),
                                 headers=kscfg.req_headers,
-                                name="update_item_existing_5_attr_5_expected_return_none_10_fields_no_lsi"
+                                name="update_item_existing_5_attr_5_expected_return_none_10_fields"
             )
             if resp.status_code == 200:
                 attribute_key["LastPostedBy"] = last_postby
@@ -253,14 +278,17 @@ class UserBehavior(locust.TaskSet):
 
 
     @task(1)
-    def update_item_existing_5_attr_5_expected_return_all_old_10_fields_no_lsi(
+    def update_item_existing_5_attr_5_expected_return_all_old_10_fields(
             self):
-        table_name = random.choice(table_10_fields_no_lsi_list)
+        table_name = random.choice(table_10_fields_no_lsi_list
+                                   if cfg.NO_LSI else table_10_fields_1_lsi_list)
+        key_list = key_10_fields_no_lsi_list if cfg.NO_LSI else key_10_fields_1_lsi_list
+        query = qry.UPDATE_ITEM_5_ATTR_5_EXPECTED_RETURN_ALL_OLD_10_FIELDS_NO_LSI_RQ if cfg.NO_LSI else qry.UPDATE_ITEM_5_ATTR_5_EXPECTED_RETURN_ALL_OLD_10_FIELDS_1_LSI_RQ
         req_url = ('/v1/' +
                    PROJECT_ID +
                    '/data/tables/' + table_name + '/update_item')
-        if len(key_10_fields_no_lsi_list) > 0:
-            attribute_key = random.choice(key_10_fields_no_lsi_list)
+        if len(key_list) > 0:
+            attribute_key = random.choice(key_list)
             subject_key = attribute_key["Subject"]
             last_postby_expected = attribute_key["LastPostedBy"]
             last_postby = self.random_name(20)
@@ -274,7 +302,7 @@ class UserBehavior(locust.TaskSet):
             additional_field_4 = self.random_name(20)
 
             resp = self.client.post(req_url,
-                                    qry.UPDATE_ITEM_5_ATTR_5_EXPECTED_RETURN_ALL_OLD_10_FIELDS_NO_LSI_RQ % (
+                                    query % (
                                         subject_key,
                                         last_postby,
                                         additional_field_1,
@@ -288,7 +316,7 @@ class UserBehavior(locust.TaskSet):
                                         additional_field_4_expected
                                     ),
                                     headers=kscfg.req_headers,
-                                    name="update_item_existing_5_attr_5_expected_return_all_old_10_fields_no_lsi"
+                                    name="update_item_existing_5_attr_5_expected_return_all_old_10_fields"
             )
             if resp.status_code == 200:
                 attribute_key["LastPostedBy"] = last_postby
@@ -300,33 +328,39 @@ class UserBehavior(locust.TaskSet):
     ########## Update Item: update existing, delete action                               #############
     ##########              attribute to be deleted: 1 or 5, expected conditions: 1 or 5 #############
     @task(1)
-    def update_item_delete_existing_1_attr_1_expected_return_none_10_fields_no_lsi(self):
-        table_name = random.choice(table_10_fields_no_lsi_list)
+    def update_item_delete_existing_1_attr_1_expected_return_none_10_fields(self):
+        table_name = random.choice(table_10_fields_no_lsi_list
+                                   if cfg.NO_LSI else table_10_fields_1_lsi_list)
+        key_list = key_10_fields_no_lsi_list if cfg.NO_LSI else key_10_fields_1_lsi_list
+        query = qry.UPDATE_ITEM_DELETE_1_ATTR_1_EXPECTED_RETURN_NONE_10_FIELDS_NO_LSI_RQ if cfg.NO_LSI else qry.UPDATE_ITEM_DELETE_1_ATTR_1_EXPECTED_RETURN_NONE_10_FIELDS_1_LSI_RQ
         req_url = ('/v1/' +
                    PROJECT_ID +
                    '/data/tables/' + table_name + '/update_item')
-        if len(key_10_fields_no_lsi_list) > 0:
-            attribute_key = random.choice(key_10_fields_no_lsi_list)
+        if len(key_list) > 0:
+            attribute_key = random.choice(key_list)
             subject_key = attribute_key["Subject"]
             last_postby_expected = attribute_key["LastPostedBy"]
             if last_postby_expected is None:
                 return
 
-            resp = self.client.post(req_url, qry.UPDATE_ITEM_DELETE_1_ATTR_1_EXPECTED_RETURN_NONE_10_FIELDS_NO_LSI_RQ % (
+            resp = self.client.post(req_url, query % (
                 subject_key, last_postby_expected),
                 headers=kscfg.req_headers,
-                name="update_item_delete_existing_1_attr_1_expected_return_none_10_fields_no_lsi")
+                name="update_item_delete_existing_1_attr_1_expected_return_none_10_fields")
             if resp.status_code == 200:
                 attribute_key["LastPostedBy"] = None
 
     @task(1)
-    def update_item_delete_existing_5_attr_5_expected_return_none_10_fields_no_lsi(self):
-        table_name = random.choice(table_10_fields_no_lsi_list)
+    def update_item_delete_existing_5_attr_5_expected_return_none_10_fields(self):
+        table_name = random.choice(table_10_fields_no_lsi_list
+                                   if cfg.NO_LSI else table_10_fields_1_lsi_list)
+        key_list = key_10_fields_no_lsi_list if cfg.NO_LSI else key_10_fields_1_lsi_list
+        query = qry.UPDATE_ITEM_DELETE_5_ATTR_5_EXPECTED_RETURN_NONE_10_FIELDS_NO_LSI_RQ if cfg.NO_LSI else qry.UPDATE_ITEM_DELETE_5_ATTR_5_EXPECTED_RETURN_NONE_10_FIELDS_1_LSI_RQ
         req_url = ('/v1/' +
                    PROJECT_ID +
                    '/data/tables/' + table_name + '/update_item')
-        if len(key_10_fields_no_lsi_list) > 0:
-            attribute_key = random.choice(key_10_fields_no_lsi_list)
+        if len(key_list) > 0:
+            attribute_key = random.choice(key_list)
             subject_key = attribute_key["Subject"]
             last_postby_expected = attribute_key["LastPostedBy"]
             additional_field_1_expected = attribute_key["AdditionalField1"]
@@ -340,12 +374,12 @@ class UserBehavior(locust.TaskSet):
                         additional_field_4_expected]):
                 return
 
-            resp = self.client.post(req_url, qry.UPDATE_ITEM_DELETE_5_ATTR_5_EXPECTED_RETURN_NONE_10_FIELDS_NO_LSI_RQ % (
+            resp = self.client.post(req_url, query % (
                 subject_key, last_postby_expected, additional_field_1_expected,
                 additional_field_2_expected, additional_field_3_expected,
                 additional_field_4_expected),
                 headers=kscfg.req_headers,
-                name="update_item_delete_existing_5_attr_5_expected_return_none_10_fields_no_lsi")
+                name="update_item_delete_existing_5_attr_5_expected_return_none_10_fields")
             if resp.status_code == 200:
                 attribute_key["LastPostedBy"] = None
                 attribute_key["AdditionalField1"] = None
@@ -356,31 +390,37 @@ class UserBehavior(locust.TaskSet):
     ########## Update Item: update existing, add action (atomic counter)               #############
     ##########              attribute to be added: 1 or 5, expected conditions: 1 or 5 #############
     @task(1)
-    def update_item_add_count_existing_1_attr_1_expected_return_none_10_fields_no_lsi(self):
-        table_name = random.choice(table_10_fields_no_lsi_list)
+    def update_item_add_count_existing_1_attr_1_expected_return_none_10_fields(self):
+        table_name = random.choice(table_10_fields_no_lsi_list
+                                   if cfg.NO_LSI else table_10_fields_1_lsi_list)
+        key_list = key_10_fields_no_lsi_list if cfg.NO_LSI else key_10_fields_1_lsi_list
+        query = qry.UPDATE_ITEM_ADD_COUNT_1_ATTR_1_EXPECTED_RETURN_NONE_10_FIELDS_NO_LSI_RQ if cfg.NO_LSI else qry.UPDATE_ITEM_ADD_COUNT_1_ATTR_1_EXPECTED_RETURN_NONE_10_FIELDS_1_LSI_RQ
         req_url = ('/v1/' +
                    PROJECT_ID +
                    '/data/tables/' + table_name + '/update_item')
-        if len(key_10_fields_no_lsi_list) > 0:
-            attribute_key = random.choice(key_10_fields_no_lsi_list)
+        if len(key_list) > 0:
+            attribute_key = random.choice(key_list)
             subject_key = attribute_key["Subject"]
             last_postby_expected = attribute_key["LastPostedBy"]
             if last_postby_expected is None:
                 return
 
-            resp = self.client.post(req_url, qry.UPDATE_ITEM_ADD_COUNT_1_ATTR_1_EXPECTED_RETURN_NONE_10_FIELDS_NO_LSI_RQ % (
+            resp = self.client.post(req_url, query % (
                 subject_key, last_postby_expected),
                 headers=kscfg.req_headers,
-                name="update_item_add_count_existing_1_attr_1_expected_return_none_10_fields_no_lsi")
+                name="update_item_add_count_existing_1_attr_1_expected_return_none_10_fields")
 
     @task(1)
-    def update_item_add_count_existing_5_attr_5_expected_return_none_10_fields_no_lsi(self):
-        table_name = random.choice(table_10_fields_no_lsi_list)
+    def update_item_add_count_existing_5_attr_5_expected_return_none_10_fields(self):
+        table_name = random.choice(table_10_fields_no_lsi_list
+                                   if cfg.NO_LSI else table_10_fields_1_lsi_list)
+        key_list = key_10_fields_no_lsi_list if cfg.NO_LSI else key_10_fields_1_lsi_list
+        query = qry.UPDATE_ITEM_ADD_COUNT_5_ATTR_5_EXPECTED_RETURN_NONE_10_FIELDS_NO_LSI_RQ if cfg.NO_LSI else qry.UPDATE_ITEM_ADD_COUNT_5_ATTR_5_EXPECTED_RETURN_NONE_10_FIELDS_1_LSI_RQ
         req_url = ('/v1/' +
                    PROJECT_ID +
                    '/data/tables/' + table_name + '/update_item')
-        if len(key_10_fields_no_lsi_list) > 0:
-            attribute_key = random.choice(key_10_fields_no_lsi_list)
+        if len(key_list) > 0:
+            attribute_key = random.choice(key_list)
             subject_key = attribute_key["Subject"]
             last_postby_expected = attribute_key["LastPostedBy"]
             additional_field_1_expected = attribute_key["AdditionalField1"]
@@ -394,43 +434,49 @@ class UserBehavior(locust.TaskSet):
                         additional_field_4_expected]):
                 return
 
-            resp = self.client.post(req_url, qry.UPDATE_ITEM_ADD_COUNT_5_ATTR_5_EXPECTED_RETURN_NONE_10_FIELDS_NO_LSI_RQ % (
+            resp = self.client.post(req_url, query % (
                 subject_key, last_postby_expected, additional_field_1_expected,
                 additional_field_2_expected, additional_field_3_expected,
                 additional_field_4_expected),
                 headers=kscfg.req_headers,
-                name="update_item_add_count_existing_5_attr_5_expected_return_none_10_fields_no_lsi")
+                name="update_item_add_count_existing_5_attr_5_expected_return_none_10_fields")
 
 
     ########## Update Item: update existing, add action (set)                          #############
     ##########              attribute to be added: 1 or 5, expected conditions: 1 or 5 #############
     @task(1)
-    def update_item_add_set_existing_1_attr_1_expected_return_none_10_fields_no_lsi(self):
-        table_name = random.choice(table_10_fields_no_lsi_list)
+    def update_item_add_set_existing_1_attr_1_expected_return_none_10_fields(self):
+        table_name = random.choice(table_10_fields_no_lsi_list
+                                   if cfg.NO_LSI else table_10_fields_1_lsi_list)
+        key_list = key_10_fields_no_lsi_list if cfg.NO_LSI else key_10_fields_1_lsi_list
+        query = qry.UPDATE_ITEM_ADD_SET_1_ATTR_1_EXPECTED_RETURN_NONE_10_FIELDS_NO_LSI_RQ if cfg.NO_LSI else qry.UPDATE_ITEM_ADD_SET_1_ATTR_1_EXPECTED_RETURN_NONE_10_FIELDS_1_LSI_RQ
         req_url = ('/v1/' +
                    PROJECT_ID +
                    '/data/tables/' + table_name + '/update_item')
-        if len(key_10_fields_no_lsi_list) > 0:
-            attribute_key = random.choice(key_10_fields_no_lsi_list)
+        if len(key_list) > 0:
+            attribute_key = random.choice(key_list)
             subject_key = attribute_key["Subject"]
             last_postby_expected = attribute_key["LastPostedBy"]
             if last_postby_expected is None:
                 return
 
             add_set = self.random_name(20)
-            resp = self.client.post(req_url, qry.UPDATE_ITEM_ADD_SET_1_ATTR_1_EXPECTED_RETURN_NONE_10_FIELDS_NO_LSI_RQ % (
+            resp = self.client.post(req_url, query % (
                 subject_key, add_set, last_postby_expected),
                 headers=kscfg.req_headers,
-                name="update_item_add_set_existing_1_attr_1_expected_return_none_10_fields_no_lsi")
+                name="update_item_add_set_existing_1_attr_1_expected_return_none_10_fields")
 
     @task(1)
-    def update_item_add_set_existing_5_attr_5_expected_return_none_10_fields_no_lsi(self):
-        table_name = random.choice(table_10_fields_no_lsi_list)
+    def update_item_add_set_existing_5_attr_5_expected_return_none_10_fields(self):
+        table_name = random.choice(table_10_fields_no_lsi_list
+                                   if cfg.NO_LSI else table_10_fields_1_lsi_list)
+        key_list = key_10_fields_no_lsi_list if cfg.NO_LSI else key_10_fields_1_lsi_list
+        query = qry.UPDATE_ITEM_ADD_SET_5_ATTR_5_EXPECTED_RETURN_NONE_10_FIELDS_NO_LSI_RQ if cfg.NO_LSI else qry.UPDATE_ITEM_ADD_SET_5_ATTR_5_EXPECTED_RETURN_NONE_10_FIELDS_1_LSI_RQ
         req_url = ('/v1/' +
                    PROJECT_ID +
                    '/data/tables/' + table_name + '/update_item')
-        if len(key_10_fields_no_lsi_list) > 0:
-            attribute_key = random.choice(key_10_fields_no_lsi_list)
+        if len(key_list) > 0:
+            attribute_key = random.choice(key_list)
             subject_key = attribute_key["Subject"]
             last_postby_expected = attribute_key["LastPostedBy"]
             additional_field_1_expected = attribute_key["AdditionalField1"]
@@ -445,24 +491,27 @@ class UserBehavior(locust.TaskSet):
                 return
 
             add_set = self.random_name(20)
-            resp = self.client.post(req_url, qry.UPDATE_ITEM_ADD_SET_5_ATTR_5_EXPECTED_RETURN_NONE_10_FIELDS_NO_LSI_RQ % (
+            resp = self.client.post(req_url, query % (
                 subject_key, add_set,
                 last_postby_expected, additional_field_1_expected,
                 additional_field_2_expected, additional_field_3_expected,
                 additional_field_4_expected),
                 headers=kscfg.req_headers,
-                name="update_item_add_set_existing_5_attr_5_expected_return_none_10_fields_no_lsi")
+                name="update_item_add_set_existing_5_attr_5_expected_return_none_10_fields")
 
     ########## Update Item: update existing, add action (map)                          #############
     ##########              attribute to be added: 1 or 5, expected conditions: 1 or 5 #############
     @task(1)
-    def update_item_add_map_existing_1_attr_1_expected_return_none_10_fields_no_lsi(self):
-        table_name = random.choice(table_10_fields_no_lsi_list)
+    def update_item_add_map_existing_1_attr_1_expected_return_none_10_fields(self):
+        table_name = random.choice(table_10_fields_no_lsi_list
+                                   if cfg.NO_LSI else table_10_fields_1_lsi_list)
+        key_list = key_10_fields_no_lsi_list if cfg.NO_LSI else key_10_fields_1_lsi_list
+        query = qry.UPDATE_ITEM_ADD_MAP_1_ATTR_1_EXPECTED_RETURN_NONE_10_FIELDS_NO_LSI_RQ if cfg.NO_LSI else qry.UPDATE_ITEM_ADD_MAP_1_ATTR_1_EXPECTED_RETURN_NONE_10_FIELDS_1_LSI_RQ
         req_url = ('/v1/' +
                    PROJECT_ID +
                    '/data/tables/' + table_name + '/update_item')
-        if len(key_10_fields_no_lsi_list) > 0:
-            attribute_key = random.choice(key_10_fields_no_lsi_list)
+        if len(key_list) > 0:
+            attribute_key = random.choice(key_list)
             subject_key = attribute_key["Subject"]
             last_postby_expected = attribute_key["LastPostedBy"]
             if last_postby_expected is None:
@@ -470,19 +519,22 @@ class UserBehavior(locust.TaskSet):
 
             add_map_key = self.random_name(20)
             add_map_val = self.random_name(20)
-            resp = self.client.post(req_url, qry.UPDATE_ITEM_ADD_MAP_1_ATTR_1_EXPECTED_RETURN_NONE_10_FIELDS_NO_LSI_RQ % (
+            resp = self.client.post(req_url, query % (
                 subject_key, add_map_key, add_map_val, last_postby_expected),
                 headers=kscfg.req_headers,
-                name="update_item_add_map_existing_1_attr_1_expected_return_none_10_fields_no_lsi")
+                name="update_item_add_map_existing_1_attr_1_expected_return_none_10_fields")
 
     @task(1)
-    def update_item_add_map_existing_5_attr_5_expected_return_none_10_fields_no_lsi(self):
-        table_name = random.choice(table_10_fields_no_lsi_list)
+    def update_item_add_map_existing_5_attr_5_expected_return_none_10_fields(self):
+        table_name = random.choice(table_10_fields_no_lsi_list
+                                   if cfg.NO_LSI else table_10_fields_1_lsi_list)
+        key_list = key_10_fields_no_lsi_list if cfg.NO_LSI else key_10_fields_1_lsi_list
+        query = qry.UPDATE_ITEM_ADD_MAP_5_ATTR_5_EXPECTED_RETURN_NONE_10_FIELDS_NO_LSI_RQ if cfg.NO_LSI else qry.UPDATE_ITEM_ADD_MAP_5_ATTR_5_EXPECTED_RETURN_NONE_10_FIELDS_1_LSI_RQ
         req_url = ('/v1/' +
                    PROJECT_ID +
                    '/data/tables/' + table_name + '/update_item')
-        if len(key_10_fields_no_lsi_list) > 0:
-            attribute_key = random.choice(key_10_fields_no_lsi_list)
+        if len(key_list) > 0:
+            attribute_key = random.choice(key_list)
             subject_key = attribute_key["Subject"]
             last_postby_expected = attribute_key["LastPostedBy"]
             additional_field_1_expected = attribute_key["AdditionalField1"]
@@ -498,13 +550,13 @@ class UserBehavior(locust.TaskSet):
 
             add_map_key = self.random_name(20)
             add_map_val = self.random_name(20)
-            resp = self.client.post(req_url, qry.UPDATE_ITEM_ADD_MAP_5_ATTR_5_EXPECTED_RETURN_NONE_10_FIELDS_NO_LSI_RQ % (
+            resp = self.client.post(req_url, query % (
                 subject_key, add_map_key, add_map_val,
                 last_postby_expected, additional_field_1_expected,
                 additional_field_2_expected, additional_field_3_expected,
                 additional_field_4_expected),
                 headers=kscfg.req_headers,
-                name="update_item_add_map_existing_5_attr_5_expected_return_none_10_fields_no_lsi")
+                name="update_item_add_map_existing_5_attr_5_expected_return_none_10_fields")
 
 
 class MagnetoDBUser(locust.HttpLocust):
