@@ -217,7 +217,7 @@ if __name__ == '__main__':
             config = template
             for key in case:
                 config = config.replace('{{%s}}' % key, case[key])
-            with open(os.path.join(sys.argv[2], 'config.py', 'w') as f:
+            with open(os.path.join(sys.argv[2], 'config.py'), 'w') as f:
                 f.write(config)
             try:
                 run_benchmark(sys.argv[1], conf, sys.argv[2])
