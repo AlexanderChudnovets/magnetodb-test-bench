@@ -39,9 +39,9 @@ class UserBehavior(locust.TaskSet):
     def list_tables_with_limit(self):
         req_url = ('/v1/' +
                    PROJECT_ID +
-                   '/data/tables?limit=' + cfg.LIMIT)
+                   '/data/tables?limit=' + str(cfg.LIMIT))
         self.client.get(req_url, headers=kscfg.req_headers,
-                        name="list_tables_with_limit_" + cfg.LIMIT)
+                        name="list_tables_with_limit_" + str(cfg.LIMIT))
 
 
 class MagnetoDBUser(locust.HttpLocust):
