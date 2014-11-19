@@ -72,7 +72,7 @@ class LocustBenchmarkRunner(BenchmarkRunner):
                 if os.path.isfile(self.benchmark.config.TABLE_LIST):
                     put(self.benchmark.config.TABLE_LIST, self.benchmark.config.TABLE_LIST)
                 if os.path.isfile(self.benchmark.config.ITEM_KEY_LIST):
-                    put(self.benchmark.config.TABLE_LIST, self.benchmark.config.ITEM_KEY_LIST)
+                    put(self.benchmark.config.ITEM_KEY_LIST, self.benchmark.config.ITEM_KEY_LIST)
             self.runbg(cmd % ('%s/%s' % (slave_path, self.benchmark.__name__.split('.')[-1]), host, master_ip, master_port))
 
     def start_master(self, master_ip, master_port, master_user, master_password, host, requests_count):

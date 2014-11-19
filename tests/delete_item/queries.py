@@ -507,7 +507,7 @@ DELETE_ITEM_RETURN_NONE_3_FIELDS_NO_LSI_RQ = '''
       "ForumName": {"S": "MagnetoDB"},
       "Subject": {"S": "%s"}
     },
-    "returnValues": "NONE"
+    "return_values": "NONE"
 }
 '''
 
@@ -517,7 +517,7 @@ DELETE_ITEM_RETURN_ALL_OLD_3_FIELDS_NO_LSI_RQ = '''
       "ForumName": {"S": "MagnetoDB"},
       "Subject": {"S": "%s"}
     },
-    "returnValues": "ALL_OLD"
+    "return_values": "ALL_OLD"
 }
 '''
 
@@ -538,7 +538,7 @@ DELETE_ITEM_EXPECTED_RETURN_NONE_3_FIELDS_NO_LSI_RQ = '''
             "exists": false
         }
     },
-    "returnValues": "NONE"
+    "return_values": "NONE"
 }
 '''
 
@@ -559,7 +559,7 @@ DELETE_ITEM_EXPECTED_RETURN_ALL_OLD_3_FIELDS_NO_LSI_RQ = '''
             "exists": false
         }
     },
-    "returnValues": "ALL_OLD"
+    "return_values": "ALL_OLD"
 }
 '''
 
@@ -569,7 +569,7 @@ DELETE_ITEM_RETURN_NONE_3_FIELDS_1_LSI_RQ = '''
       "ForumName": {"S": "MagnetoDB"},
       "Subject": {"S": "%s"}
     },
-    "returnValues": "NONE"
+    "return_values": "NONE"
 }
 '''
 
@@ -579,7 +579,7 @@ DELETE_ITEM_RETURN_ALL_OLD_3_FIELDS_1_LSI_RQ = '''
       "ForumName": {"S": "MagnetoDB"},
       "Subject": {"S": "%s"}
     },
-    "returnValues": "ALL_OLD"
+    "return_values": "ALL_OLD"
 }
 '''
 
@@ -600,7 +600,7 @@ DELETE_ITEM_EXPECTED_RETURN_NONE_3_FIELDS_1_LSI_RQ = '''
             "exists": false
         }
     },
-    "returnValues": "NONE"
+    "return_values": "NONE"
 }
 '''
 
@@ -621,7 +621,7 @@ DELETE_ITEM_EXPECTED_RETURN_ALL_OLD_3_FIELDS_1_LSI_RQ = '''
             "exists": false
         }
     },
-    "returnValues": "ALL_OLD"
+    "return_values": "ALL_OLD"
 }
 '''
 
@@ -632,7 +632,7 @@ DELETE_ITEM_RETURN_NONE_10_FIELDS_5_LSI_RQ = '''
       "ForumName": {"S": "MagnetoDB"},
       "Subject": {"S": "%s"}
     },
-    "returnValues": "NONE"
+    "return_values": "NONE"
 }
 '''
 
@@ -642,7 +642,7 @@ DELETE_ITEM_RETURN_ALL_OLD_10_FIELDS_5_LSI_RQ = '''
       "ForumName": {"S": "MagnetoDB"},
       "Subject": {"S": "%s"}
     },
-    "returnValues": "ALL_OLD"
+    "return_values": "ALL_OLD"
 }
 '''
 
@@ -663,7 +663,7 @@ DELETE_ITEM_EXPECTED_RETURN_NONE_10_FIELDS_5_LSI_RQ = '''
             "exists": false
         }
     },
-    "returnValues": "NONE"
+    "return_values": "NONE"
 }
 '''
 
@@ -684,7 +684,7 @@ DELETE_ITEM_EXPECTED_RETURN_ALL_OLD_10_FIELDS_5_LSI_RQ = '''
             "exists": false
         }
     },
-    "returnValues": "ALL_OLD"
+    "return_values": "ALL_OLD"
 }
 '''
 
