@@ -184,7 +184,7 @@ class UserBehavior(locust.TaskSet):
         if len(key_10_fields_5_lsi_list) > 0:
             attribute_key = random.choice(key_10_fields_5_lsi_list)
             subject_key = attribute_key["Subject"]
-            self.client.post(req_url, qry.DELETE_ITEM_EXPECTED_RETURN_NONE_3_FIELDS_1_LSI_RQ % (subject_key), headers=kscfg.req_headers, name="delete_item_expected_return_none_10_fields_5_lsi")
+            self.client.post(req_url, qry.DELETE_ITEM_EXPECTED_RETURN_NONE_10_FIELDS_5_LSI_RQ % (subject_key), headers=kscfg.req_headers, name="delete_item_expected_return_none_10_fields_5_lsi")
 
     @task(1)
     def delete_item_expected_return_all_old_10_fields_5_lsi(self):
